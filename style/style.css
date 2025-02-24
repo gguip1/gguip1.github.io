@@ -517,6 +517,10 @@ h2 {
 }
 
 @media (max-width: 768px) {
+    .page {
+        margin: 0.5rem auto;  /* 상하 여백 줄임 */
+    }
+
     .about-content {
         grid-template-columns: 1fr;
     }
@@ -536,6 +540,7 @@ h2 {
     .page {
         width: 100%;
         padding: 1.5cm;
+        margin: 0.5rem auto;  /* 상하 여백 줄임 */
     }
 
     .skills-grid {
@@ -552,6 +557,13 @@ h2 {
 
     .skills-container {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .page {
+        padding: 1cm;  /* 패딩 더 줄임 */
+        margin: 0;     /* 모바일에서는 여백 제거 */
     }
 }
 
