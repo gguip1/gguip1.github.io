@@ -1,25 +1,18 @@
-// document.addEventListener('DOMContentLoaded', () => {
-//     const sections = document.querySelectorAll('section');
+document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.getElementById('menuBtn');
+    const menuPanel = document.getElementById('menuPanel');
 
-//     const observerOptions = {
-//         root: null,
-//         rootMargin: '0px',
-//         threshold: 0.1
-//     };
+    // 메뉴 토글 기능
+    menuBtn.addEventListener('click', () => {
+        menuBtn.classList.toggle('active');
+        menuPanel.classList.toggle('show');
+    });
 
-//     const observer = new IntersectionObserver((entries, observer) => {
-//         entries.forEach(entry => {
-//             if (entry.isIntersecting) {
-//                 entry.target.style.opacity = '1';
-//                 entry.target.style.transform = 'translateY(0)';
-//             }
-//         });
-//     }, observerOptions);
-
-//     sections.forEach(section => {
-//         section.style.opacity = '0';
-//         section.style.transform = 'translateY(20px)';
-//         section.style.transition = 'all 0.5s ease-in-out';
-//         observer.observe(section);
-//     });
-// });
+    // 메뉴 외부 클릭시 닫기
+    document.addEventListener('click', (e) => {
+        if (!menuBtn.contains(e.target) && !menuPanel.contains(e.target)) {
+            menuBtn.classList.remove('active');
+            menuPanel.classList.remove('show');
+        }
+    });
+});

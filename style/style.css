@@ -406,6 +406,116 @@ h2 {
     color: var(--primary-color);
 }
 
+/* 햄버거 메뉴 버튼 스타일 */
+.menu-btn {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.hamburger-line {
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+/* 메뉴 버튼 활성화 상태 */
+.menu-btn.active .hamburger-line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.menu-btn.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-btn.active .hamburger-line:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* 메뉴 패널 스타일 수정 */
+.menu-panel {
+    position: fixed;
+    top: 6rem;  /* 5rem에서 6rem으로 수정 */
+    right: 2rem;
+    width: 180px;  /* 너비 지정 */
+    background: white;
+    border-radius: 8px;
+    padding: 0.8rem;  /* 패딩 증가 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+/* 화살표 추가 */
+.menu-panel::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 16px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    transform: rotate(45deg);
+    box-shadow: -2px -2px 5px rgba(0,0,0,0.05);
+}
+
+/* 화살표 뒤의 흰색 배경 */
+.menu-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 10px;
+    width: 28px;
+    height: 12px;
+    background: white;
+}
+
+.menu-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 1.2rem;  /* 패딩 증가 */
+    color: var(--primary-color);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    background: #f8f9fa;
+}
+
+.menu-item.active {
+    background: #e8f0fe;
+    color: #1a73e8;
+}
+
 @media (max-width: 768px) {
     .about-content {
         grid-template-columns: 1fr;
