@@ -1,0 +1,43 @@
+{
+    "skills": {
+        "Backend Development": {
+            "tags": ["Python", "Java", "Spring Boot", "FastAPI", "Node.js"]
+        },
+        "Database": {
+            "tags": ["PostgreSQL", "MySQL", "MongoDB", "Redis"]
+        },
+        "DevOps": {
+            "tags": ["Docker", "AWS", "CI/CD", "Git"]
+        }
+    },
+    "projects": [
+        {
+            "title": "EchoChat",
+            "period": "2025.01 - 2025.02",
+            "subtitle": "대화 스타일을 학습하는 AI 챗봇",
+            "tags": ["Python", "FastAPI", "PostgreSQL", "Ollama"],
+            "role": "Backend Developer",
+            "description": "사용자의 채팅 기록을 분석하여 대화 스타일을 학습하고 자연스러운 대화가 가능한 AI 챗봇 시스템",
+            "highlights": [
+                "TF-IDF 및 RAG 방식의 대화 검색 시스템 구현",
+                "Ollama 기반 응답 생성 엔진 개발",
+                "Streamlit GUI 데모 버전 제작"
+            ],
+            "github": "https://github.com/gguip1/EchoChat"
+        },
+        {
+            "title": "스프린트 데이",
+            "period": "2025.02 - 진행 중",
+            "subtitle": "일정 공유 플랫폼",
+            "tags": ["React", "FastAPI", "PostgreSQL", "Docker"],
+            "role": "Full Stack Developer",
+            "description": "일일 계획을 수립하고 친구들과 공유할 수 있는 소셜 일정 관리 서비스",
+            "highlights": [
+                "소셜 기능이 통합된 일정 관리 시스템 설계",
+                "RESTful API 아키텍처 설계 및 구현",
+                "JWT 기반 사용자 인증 시스템 개발"
+            ],
+            "github": "https://github.com/gguip1/SprintDay"
+        }
+    ]
+}
