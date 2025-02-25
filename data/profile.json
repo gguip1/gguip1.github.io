@@ -1,10 +1,10 @@
 {
     "header": {
-        "name": "gguip1",
+        "name": "이기용",
         "title": "백엔드 개발자",
         "experience": {
-            "years": 0,
-            "label": "Years Experience"
+            "years": "",
+            "label": ""
         },
         "contacts": [
             {
@@ -30,15 +30,10 @@
     "introduction": "사용자 중심의 서비스 개발과 안정적인 시스템 구축에 전문성을 가진 백엔드 개발자입니다. 지속적인 학습과 성장을 추구하며, 효율적인 코드 작성과 시스템 최적화에 깊은 관심을 가지고 있습니다.",
     "education": [
         {
-            "school": "한국방송통신대학교",
-            "major": "컴퓨터과학과",
+            "school": "원광대학교",
+            "major": "컴퓨터소프트웨어공학과",
             "degree": "학사",
-            "period": "2021.03 - 2025.02"
-        },
-        {
-            "school": "삼성 청년 SW 아카데미 (SSAFY)",
-            "major": "Java 트랙",
-            "period": "2023.07 - 2024.06"
+            "period": "2019.03 - 2025.02"
         }
     ],
     "certifications": [
@@ -50,7 +45,7 @@
         {
             "title": "SQLD",
             "organization": "한국데이터산업진흥원",
-            "date": "2024.04"
+            "date": "2024.06"
         }
     ]
 }

@@ -65,15 +65,15 @@ function renderProjects(projects) {
                 </div>
             </div>
             <div class="project-subtitle">${project.subtitle}</div>
-            
-            <div class="project-tags">
-                ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-            </div>
 
             <div class="project-roles">
                 ${project.roles.map(role => `
                     <span class="role-badge">${role}</span>
                 `).join('')}
+            </div>
+
+            <div class="project-tags">
+                ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
             </div>
 
             <div class="project-description">

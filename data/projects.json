@@ -15,6 +15,30 @@
     },
     "projects": [
         {
+            "title": "Nutrition Manager",
+            "period": "2025.01 - 2025.02",
+            "teamSize": 3,
+            "subtitle": "식단 관리 애플리케이션",
+            "tags": ["Python", "FastAPI", "PostgreSQL", "Ollama"],
+            "roles": ["Backend Developer", "ML Engineer", "DevOps"],
+            "description": "사용자의 채팅 기록을 분석하여 대화 스타일을 학습하고 자연스러운 대화가 가능한 AI 챗봇 시스템",
+            "highlights": [
+                "TF-IDF 및 RAG 방식의 대화 검색 시스템 구현",
+                "Ollama 기반 응답 생성 엔진 개발",
+                "Streamlit GUI 데모 버전 제작"
+            ],
+            "links": [
+                {
+                    "url": "https://github.com/gguip1/EchoChat",
+                    "label": "GitHub Repository"
+                },
+                {
+                    "url": "https://echochat-demo.example.com",
+                    "label": "Live Demo"
+                }
+            ]
+        },
+        {
             "title": "EchoChat",
             "period": "2025.01 - 2025.02",
             "teamSize": 4,
