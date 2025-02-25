@@ -95,6 +95,9 @@ function renderProjects(projects) {
             </div>
         </article>
     `).join('');
+    
+    // 프로젝트 렌더링 후 슬라이더 초기화
+    initSlider(projects);
 }
 
 // 프로젝트로 스크롤하는 함수 수정
@@ -116,6 +119,76 @@ function scrollToProject(title) {
         card.classList.add('highlight');
         setTimeout(() => card.classList.remove('highlight'), 2000);
     }
+}
+
+function initSlider(projects) {
+    let currentSlide = 0;
+    const totalSlides = projects.length;
+    const projectList = document.querySelector('.project-list');
+    const prevButton = document.querySelector('.slider-button.prev');
+    const nextButton = document.querySelector('.slider-button.next');
+    const indicators = document.querySelector('.project-indicators');
+    
+    // 인디케이터 생성
+    indicators.innerHTML = projects.map((_, index) => `
+        <span class="indicator ${index === 0 ? 'active' : ''}" data-index="${index}"></span>
+    `).join('');
+
+    function updateSlider() {
+        // 슬라이드 이동
+        projectList.style.transform = `translateX(-${currentSlide * 100}%)`;
+        
+        // 현재 카드 활성화
+        document.querySelectorAll('.project-card').forEach((card, index) => {
+            card.classList.toggle('active', index === currentSlide);
+        });
+        
+        // 버튼 상태 업데이트
+        prevButton.disabled = currentSlide === 0;
+        nextButton.disabled = currentSlide === totalSlides - 1;
+        
+        // 인디케이터 업데이트
+        document.querySelectorAll('.indicator').forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+    }
+
+    // 이벤트 리스너
+    prevButton.addEventListener('click', () => {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlider();
+        }
+    });
+
+    nextButton.addEventListener('click', () => {
+        if (currentSlide < totalSlides - 1) {
+            currentSlide++;
+            updateSlider();
+        }
+    });
+
+    // 인디케이터 클릭 이벤트
+    indicators.addEventListener('click', (e) => {
+        if (e.target.classList.contains('indicator')) {
+            currentSlide = parseInt(e.target.dataset.index);
+            updateSlider();
+        }
+    });
+
+    // 키보드 네비게이션
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' && currentSlide > 0) {
+            currentSlide--;
+            updateSlider();
+        } else if (e.key === 'ArrowRight' && currentSlide < totalSlides - 1) {
+            currentSlide++;
+            updateSlider();
+        }
+    });
+
+    // 초기 상태 설정
+    updateSlider();
 }
 
 document.addEventListener('DOMContentLoaded', loadData);
