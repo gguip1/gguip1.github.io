@@ -36,6 +36,8 @@
                     "url": "https://echochat-demo.example.com",
                     "label": "Live Demo"
                 }
+            ],
+            "images": [
             ]
         },
         {
@@ -60,6 +62,8 @@
                     "url": "https://echochat-demo.example.com",
                     "label": "Live Demo"
                 }
+            ],
+            "images": [
             ]
         },
         {
@@ -84,6 +88,8 @@
                     "url": "https://sprintday.example.com",
                     "label": "Service Link"
                 }
+            ],
+            "images": [
             ]
         }
     ]

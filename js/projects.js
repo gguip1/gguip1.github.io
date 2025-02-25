@@ -100,29 +100,26 @@ function renderProjects(projects) {
     initSlider(projects);
 }
 
-// 프로젝트로 스크롤하는 함수 수정
-function scrollToProject(title) {
-    // 정확한 프로젝트 제목으로 검색하도록 수정
-    const projectElement = Array.from(document.querySelectorAll('.project-card h3'))
-        .find(element => element.textContent === title);
+let currentSlide = 0; // 전역 변수로 현재 슬라이드 위치 관리
 
-    if (projectElement) {
-        const card = projectElement.closest('.project-card');
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+function scrollToProject(title) {
+    const projectCards = document.querySelectorAll('.project-card');
+    const projectIndex = Array.from(projectCards).findIndex(
+        card => card.querySelector('h3').textContent === title
+    );
+
+    if (projectIndex !== -1) {
+        currentSlide = projectIndex; // 현재 슬라이드 위치 업데이트
+        updateSlider(); // 슬라이더 상태 업데이트
         
-        // 다른 프로젝트의 하이라이트 효과 제거
-        document.querySelectorAll('.project-card').forEach(card => {
-            card.classList.remove('highlight');
-        });
-        
-        // 선택된 프로젝트 하이라이트
-        card.classList.add('highlight');
-        setTimeout(() => card.classList.remove('highlight'), 2000);
+        // 하이라이트 효과
+        projectCards.forEach(card => card.classList.remove('highlight'));
+        projectCards[projectIndex].classList.add('highlight');
+        setTimeout(() => projectCards[projectIndex].classList.remove('highlight'), 2000);
     }
 }
 
 function initSlider(projects) {
-    let currentSlide = 0;
     const totalSlides = projects.length;
     const projectList = document.querySelector('.project-list');
     const prevButton = document.querySelector('.slider-button.prev');
@@ -151,6 +148,10 @@ function initSlider(projects) {
         document.querySelectorAll('.indicator').forEach((dot, index) => {
             dot.classList.toggle('active', index === currentSlide);
         });
+
+        // 현재 프로젝트의 이미지 업데이트
+        const currentProject = projects[currentSlide];
+        updateProjectPreview(currentProject);
     }
 
     // 이벤트 리스너
@@ -189,6 +190,85 @@ function initSlider(projects) {
 
     // 초기 상태 설정
     updateSlider();
+
+    // 전역 함수로 만들어 다른 곳에서도 접근 가능하게 함
+    window.updateSlider = updateSlider;
 }
 
-document.addEventListener('DOMContentLoaded', loadData);
+function updateProjectPreview(project) {
+    const previewImage = document.querySelector('.preview-image');
+    const previewThumbnails = document.querySelector('.preview-thumbnails');
+    
+    if (project.images && project.images.length > 0) {
+        // 메인 이미지 업데이트
+        previewImage.innerHTML = `<img src="${project.images[0]}" alt="${project.title}">`;
+        
+        // 썸네일 업데이트
+        previewThumbnails.innerHTML = project.images.map((img, index) => `
+            <div class="preview-thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+                <img src="${img}" alt="${project.title} thumbnail ${index + 1}">
+            </div>
+        `).join('');
+
+        // 썸네일 클릭 이벤트
+        previewThumbnails.querySelectorAll('.preview-thumbnail').forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                const imgSrc = project.images[thumb.dataset.index];
+                previewImage.querySelector('img').src = imgSrc;
+                
+                // 활성화된 썸네일 표시
+                previewThumbnails.querySelectorAll('.preview-thumbnail').forEach(t => 
+                    t.classList.toggle('active', t === thumb));
+            });
+        });
+    }
+}
+
+// 인터섹션 옵저버 설정 추가
+function setupPreviewVisibility() {
+    const projectSection = document.getElementById('projects');
+    const previewElement = document.querySelector('.project-preview');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                previewElement.style.visibility = 'visible';
+                previewElement.style.opacity = '1';
+            } else {
+                previewElement.style.visibility = 'hidden';
+                previewElement.style.opacity = '0';
+            }
+        });
+    }, {
+        // 프로젝트 섹션이 절반 이상 보일 때 활성화
+        threshold: 0.5
+    });
+
+    observer.observe(projectSection);
+}
+
+function setupPreviewToggle() {
+    const toggleBtn = document.getElementById('togglePreview');
+    const previewElement = document.querySelector('.project-preview');
+    let isVisible = true; // 초기값을 true로 변경
+
+    // 초기 상태 설정
+    toggleBtn.classList.add('active'); // 버튼 활성화 상태로 시작
+    const toggleText = toggleBtn.querySelector('.toggle-text');
+    toggleText.textContent = '이미지 숨기기'; // 초기 텍스트 설정
+    
+    toggleBtn.addEventListener('click', () => {
+        isVisible = !isVisible;
+        previewElement.classList.toggle('hidden');
+        toggleBtn.classList.toggle('active');
+        
+        // 버튼 텍스트 변경
+        toggleText.textContent = isVisible ? '이미지 숨기기' : '이미지 보기';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    setupPreviewVisibility();
+    setupPreviewToggle(); // 토글 기능 초기화 추가
+});
