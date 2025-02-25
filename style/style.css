@@ -192,6 +192,13 @@ h2 {
     margin: 1rem 0;
 }
 
+.project-roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
 .role-badge {
     background: #e8f0fe;
     color: #1a73e8;
@@ -199,6 +206,7 @@ h2 {
     border-radius: 4px;
     font-size: 0.9rem;
     font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 .project-description {
@@ -229,6 +237,9 @@ h2 {
 
 .project-links {
     margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .github-link {
@@ -246,6 +257,7 @@ h2 {
 .github-link:hover {
     background: #f5f5f5;
     border-color: #ccc;
+    transform: translateY(-1px);
 }
 
 .main-header {

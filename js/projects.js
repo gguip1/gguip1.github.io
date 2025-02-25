@@ -61,8 +61,10 @@ function renderProjects(projects) {
                 ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
             </div>
 
-            <div class="project-role">
-                <span class="role-badge">${project.role}</span>
+            <div class="project-roles">
+                ${project.roles.map(role => `
+                    <span class="role-badge">${role}</span>
+                `).join('')}
             </div>
 
             <div class="project-description">
@@ -76,9 +78,11 @@ function renderProjects(projects) {
             </div>
 
             <div class="project-links">
-                <a href="${project.github}" class="github-link" target="_blank">
-                    GitHub Repository
-                </a>
+                ${project.links.map(link => `
+                    <a href="${link.url}" class="github-link" target="_blank">
+                        ${link.label}
+                    </a>
+                `).join('')}
             </div>
         </article>
     `).join('');
