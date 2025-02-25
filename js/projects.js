@@ -53,7 +53,16 @@ function renderProjects(projects) {
         <article class="project-card">
             <div class="project-header">
                 <h3>${project.title}</h3>
-                <span class="project-period">${project.period}</span>
+                <div class="project-meta">
+                    <span class="meta-item">
+                        <i class="far fa-calendar-alt"></i>
+                        ${project.period}
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-users"></i>
+                        ${project.teamSize}명
+                    </span>
+                </div>
             </div>
             <div class="project-subtitle">${project.subtitle}</div>
             

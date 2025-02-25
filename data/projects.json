@@ -17,6 +17,7 @@
         {
             "title": "EchoChat",
             "period": "2025.01 - 2025.02",
+            "teamSize": 4,
             "subtitle": "대화 스타일을 학습하는 AI 챗봇",
             "tags": ["Python", "FastAPI", "PostgreSQL", "Ollama"],
             "roles": ["Backend Developer", "ML Engineer", "DevOps"],
@@ -40,6 +41,7 @@
         {
             "title": "스프린트 데이",
             "period": "2025.02 - 진행 중",
+            "teamSize": 1,
             "subtitle": "일정 공유 플랫폼",
             "tags": ["React", "FastAPI", "PostgreSQL", "Docker"],
             "roles": ["Full Stack Developer", "Project Lead", "DevOps Engineer"],

@@ -52,6 +52,7 @@ h1 {
 .subtitle {
     font-size: 1.2rem;
     color: var(--secondary-color);
+    margin-bottom: 1rem;
 }
 
 section {
@@ -621,6 +622,74 @@ h2 {
     color: #1a73e8;
 }
 
+.project-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.meta-item i {
+    color: #37474f;  /* 더 어두운 색상 적용 */
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.education-list, .certification-list {
+    display: grid;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.education-item {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.education-period {
+    min-width: 120px;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.education-school {
+    font-weight: 500;
+    color: var(--primary-color);
+    margin-bottom: 0.2rem;
+}
+
+.education-major {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.cert-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+}
+
+.cert-title {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.cert-info {
+    display: flex;
+    gap: 1rem;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
 @media (max-width: 768px) {
     .page {
         margin: 0.5rem auto;  /* 상하 여백 줄임 */
@@ -641,7 +710,7 @@ h2 {
     }
 }
 
-@media (max-width: 21cm) {
+@media (max-width: 640px) {
     .page {
         width: 100%;
         padding: 1.5cm;
@@ -662,6 +731,17 @@ h2 {
 
     .skills-container {
         grid-template-columns: 1fr;
+    }
+
+    .education-item {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .cert-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
 
