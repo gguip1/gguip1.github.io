@@ -43,32 +43,31 @@
             ]
         },
         {
-            "title": "EchoChat",
-            "period": "2025.01 - 2025.02",
-            "teamSize": 4,
-            "subtitle": "대화 스타일을 학습하는 AI 챗봇",
-            "tags": ["Python", "FastAPI", "PostgreSQL", "Ollama"],
-            "roles": ["Backend Developer", "ML Engineer", "DevOps"],
-            "description": "사용자의 채팅 기록을 분석하여 대화 스타일을 학습하고 자연스러운 대화가 가능한 AI 챗봇 시스템",
+            "title": "TarotWithLLM",
+            "period": "2024.08.11 - 2024.08.19",
+            "teamSize": 3,
+            "subtitle": "카드를 3개 골라 타로를 봐주는 서비스",
+            "tags": ["Python", "Streamlit", "AWS", "Ollama"],
+            "roles": ["Backend Developer", "DevOps"],
+            "description": "LLM을 활용하여 사용자가 선택한 3장의 타로 카드를 해석해주는 서비스",
             "highlights": [
-                "TF-IDF 및 RAG 방식의 대화 검색 시스템 구현",
-                "Ollama 기반 응답 생성 엔진 개발",
-                "Streamlit GUI 데모 버전 제작"
+                "Python 가상 환경 및 패키지 관리로 개발 환경 구축",
+                "Streamlit을 활용한 사용자 친화적인 인터페이스 제공",
+                "AWS EC2 인스턴스를 사용하여 애플리케이션 배포",
+                "Ollama 서버와 llama3.1:8b 모델을 통한 타로 해석 생성",
+                "Boto3를 이용한 AWS 서비스 연동 구현",
+                "타로 카드 리소스를 활용한 시각적 요소 구현"
             ],
             "links": [
                 {
-                    "url": "https://github.com/gguip1/EchoChat",
+                    "url": "https://github.com/gguip1/TarotWithLLM",
                     "label": "GitHub Repository"
-                },
-                {
-                    "url": "https://echochat-demo.example.com",
-                    "label": "Live Demo"
                 }
             ]
         },
         {
-            "title": "스프린트 데이",
-            "period": "2025.02 - 진행 중",
+            "title": "문생추",
+            "period": "2025.02 - 2024.01",
             "teamSize": 1,
             "subtitle": "일정 공유 플랫폼",
             "tags": ["React", "FastAPI", "PostgreSQL", "Docker"],
