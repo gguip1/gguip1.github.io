@@ -1,9 +1,15 @@
 async function loadData() {
     try {
-        const response = await fetch('../data/projects.json');
-        const data = await response.json();
-        renderSkills(data.skills, data.projects); // projects 매개변수 추가
-        renderProjects(data.projects);
+        const [projectsResponse, skillsResponse] = await Promise.all([
+            fetch('../data/projects.json'),
+            fetch('../data/skills.json')
+        ]);
+        
+        const projectsData = await projectsResponse.json();
+        const skillsData = await skillsResponse.json();
+        
+        renderSkills(skillsData, projectsData.projects);
+        renderProjects(projectsData.projects);
     } catch (error) {
         console.error('데이터를 불러오는데 실패했습니다:', error);
     }
@@ -28,7 +34,7 @@ function renderSkills(skills, projects) {
         </div>
     `).join('');
 
-    // 스킬 태그에 이벤트 리스너 추가
+    // 스킬 태그에 프로젝트 연결
     document.querySelectorAll('.skill-tag').forEach(tag => {
         const skill = tag.dataset.skill;
         const relatedProjects = projects.filter(p => p.tags.includes(skill));
@@ -109,13 +115,29 @@ function scrollToProject(title) {
     );
 
     if (projectIndex !== -1) {
-        currentSlide = projectIndex; // 현재 슬라이드 위치 업데이트
-        updateSlider(); // 슬라이더 상태 업데이트
+        currentSlide = projectIndex;
+        updateSlider();
+        
+        // 해당 프로젝트 섹션으로 스크롤
+        const projectSection = document.getElementById('projects');
+        projectSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'
+        });
         
         // 하이라이트 효과
         projectCards.forEach(card => card.classList.remove('highlight'));
         projectCards[projectIndex].classList.add('highlight');
         setTimeout(() => projectCards[projectIndex].classList.remove('highlight'), 2000);
+        
+        // 모바일 환경에서 팝업 닫기
+        if (window.innerWidth <= 768) {
+            const popup = document.querySelector('.skill-popup[style*="display: block"]');
+            const overlay = document.querySelector('.popup-overlay.active');
+            if (popup) popup.style.display = 'none';
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
 }
 

@@ -1,43 +1,45 @@
 {
-    "skills": {
-        "Frontend Development": {
-            "tags": ["Python", "Java", "Spring Boot", "FastAPI", "Node.js"]
-        },
-        "Backend Development": {
-            "tags": ["Python", "Java", "Spring Boot", "FastAPI", "Node.js"]
-        },
-        "Database": {
-            "tags": ["PostgreSQL", "MySQL", "MongoDB", "Redis"]
-        },
-        "DevOps": {
-            "tags": ["Docker", "AWS", "CI/CD", "Git"]
-        }
-    },
     "projects": [
         {
             "title": "Nutrition Manager",
-            "period": "2025.01 - 2025.02",
+            "period": "2024.09 - 2024.12",
             "teamSize": 3,
-            "subtitle": "식단 관리 애플리케이션",
-            "tags": ["Python", "FastAPI", "PostgreSQL", "Ollama"],
-            "roles": ["Backend Developer", "ML Engineer", "DevOps"],
-            "description": "사용자의 채팅 기록을 분석하여 대화 스타일을 학습하고 자연스러운 대화가 가능한 AI 챗봇 시스템",
+            "subtitle": "AI 기반 식단 관리 애플리케이션",
+            "tags": ["Kotlin", "Android", "Python", "Django", "Java", "Spring Boot", "Thymeleaf", "MySQL", "Azure", "Docker", "YOLO"],
+            "roles": ["PM", "Android Developer", "Backend Developer"],
+            "description": "이미지 인식을 활용한 자동 식단 입력과 포인트 시스템을 통한 사용자 참여 유도를 제공하는 AI 기반 식단 관리 애플리케이션",
             "highlights": [
-                "TF-IDF 및 RAG 방식의 대화 검색 시스템 구현",
-                "Ollama 기반 응답 생성 엔진 개발",
-                "Streamlit GUI 데모 버전 제작"
+                "AI를 활용한 자동 식단 기록 (이미지 및 텍스트 입력 지원)",
+                "포인트 및 리더보드 시스템 도입을 통한 사용자 참여 유도",
+                "관리자 웹 페이지를 통한 데이터 관리 기능 제공",
+                "Docker 및 Azure 기반 배포 환경 구축",
+                "YOLO 기반 음식 인식 AI 모델 적용"
             ],
             "links": [
                 {
-                    "url": "https://github.com/gguip1/EchoChat",
+                    "url": "https://github.com/wku-team-potato",
                     "label": "GitHub Repository"
                 },
                 {
-                    "url": "https://echochat-demo.example.com",
-                    "label": "Live Demo"
+                    "url": "https://github.com/wku-team-potato/N.M_FE",
+                    "label": "Android Application Repository"
+                },
+                {
+                    "url": "https://github.com/wku-team-potato/N.M_Manager",
+                    "label": "Admin Web Repository"
+                },
+                {
+                    "url": "https://github.com/wku-team-potato/N.M_BE",
+                    "label": "Backend Repository"
+                },
+                {
+                    "url": "https://github.com/wku-team-potato/N.M_AI_BE",
+                    "label": "AI Backend Repository"
+                },
+                {
+                    "url": "https://github.com/wku-team-potato/FoodDetectAI-YOLO",
+                    "label": "AI Model Training Repository"
                 }
-            ],
-            "images": [
             ]
         },
         {
@@ -62,8 +64,6 @@
                     "url": "https://echochat-demo.example.com",
                     "label": "Live Demo"
                 }
-            ],
-            "images": [
             ]
         },
         {
@@ -88,8 +88,6 @@
                     "url": "https://sprintday.example.com",
                     "label": "Service Link"
                 }
-            ],
-            "images": [
             ]
         }
     ]

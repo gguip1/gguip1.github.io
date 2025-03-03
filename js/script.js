@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const menuBtn = document.getElementById('menuBtn');
     const menuPanel = document.getElementById('menuPanel');
-
+    
     // 메뉴 토글 기능
     menuBtn.addEventListener('click', () => {
         menuBtn.classList.toggle('active');

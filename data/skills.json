@@ -1,0 +1,14 @@
+{
+    "Frontend Development": {
+        "tags": ["Python", "Java", "Spring Boot", "FastAPI", "Node.js"]
+    },
+    "Backend Development": {
+        "tags": ["Python", "Java", "Spring Boot", "FastAPI", "Node.js"]
+    },
+    "Database": {
+        "tags": ["PostgreSQL", "MySQL", "MongoDB", "Redis"]
+    },
+    "DevOps": {
+        "tags": ["Docker", "AWS", "CI/CD", "Git"]
+    }
+}
