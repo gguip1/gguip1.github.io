@@ -3,9 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>개발자 포털 | Toy Projects</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid transparent;
+        }
+
+        .project-card:hover {
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+        }
+
+        .project-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .project-icon {
+            filter: brightness(1.2);
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            transition: color 0.3s ease;
+        }
+
+        .project-card:hover .project-title {
+            color: #667eea;
+        }
+
+        .project-description {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .project-status {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            background: #e8f5e8;
+            color: #27ae60;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .no-projects {
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div>Hello World!</div>
+    <div class="container">
+        <header>
+            <h1>🚀 개발자 포털</h1>
+            <p class="subtitle">토이 프로젝트 모음</p>
+        </header>
+
+        <div id="projects-container">
+            <div class="projects-grid" id="projects-grid">
+                <!-- 프로젝트들이 여기에 동적으로 추가됩니다 -->
+            </div>
+            
+            <div class="no-projects" id="no-projects" style="display: none;">
+                <p>아직 프로젝트가 없습니다. 새로운 프로젝트를 만들어보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 프로젝트 목록 (새 프로젝트 추가 시 여기에 추가하세요)
+        const projects = [
+            {
+                name: "Seasons",
+                folder: "seasons",
+                description: "WebSocket을 이용해 접속한 모든 사용자가 동일한 계절 상태를 실시간으로 공유하는 웹 애플리케이션",
+                icon: "🍂",
+                status: "개발중"
+            }
+        ];
+
+        // 프로젝트 카드 생성 함수
+        function createProjectCard(project) {
+            return `
+                <a href="${project.folder}/index.html" class="project-card">
+                    <div class="project-icon">${project.icon}</div>
+                    <div class="project-title">${project.name}</div>
+                    <div class="project-description">${project.description}</div>
+                    <div class="project-status">${project.status}</div>
+                </a>
+            `;
+        }
+
+        // 프로젝트 목록 렌더링
+        function renderProjects() {
+            const projectsGrid = document.getElementById('projects-grid');
+            const noProjects = document.getElementById('no-projects');
+
+            if (projects.length === 0) {
+                projectsGrid.style.display = 'none';
+                noProjects.style.display = 'block';
+            } else {
+                projectsGrid.style.display = 'grid';
+                noProjects.style.display = 'none';
+                projectsGrid.innerHTML = projects.map(createProjectCard).join('');
+            }
+        }
+
+        // 자동으로 프로젝트 폴더 감지 (실제 파일시스템 접근 불가능하므로 수동 관리)
+        function checkForNewProjects() {
+            // 웹에서는 파일시스템에 직접 접근할 수 없으므로
+            // 프로젝트는 수동으로 projects 배열에 추가해야 합니다
+            renderProjects();
+        }
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            checkForNewProjects();
+        });
+
+        // 예시 프로젝트 추가 (테스트용)
+        // projects.push({
+        //     name: "할 일 목록",
+        //     folder: "todo-list",
+        //     description: "React로 만든 할 일 관리 앱",
+        //     icon: "📝",
+        //     status: "개발중"
+        // });
+    </script>
 </body>
 </html>
