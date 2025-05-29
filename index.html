@@ -117,6 +117,49 @@
             opacity: 0.8;
         }
 
+        /* 푸터 스타일 */
+        .footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            color: white;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .footer-item a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-item a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-top: 1rem;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -128,6 +171,11 @@
             
             .projects-grid {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
                 gap: 1rem;
             }
         }
@@ -149,6 +197,30 @@
                 <p>아직 프로젝트가 없습니다. 새로운 프로젝트를 만들어보세요!</p>
             </div>
         </div>
+
+        <!-- 푸터 섹션 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-item">
+                    <span>🧑‍💻</span>
+                    <span>개발자: gguip1</span>
+                </div>
+                
+                <div class="footer-item">
+                    <span>📂</span>
+                    <a href="https://github.com/gguip1" target="_blank">GitHub: github.com/gguip1</a>
+                </div>
+                
+                <div class="footer-item">
+                    <span>📋</span>
+                    <span>MIT License</span>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 gguip1 | 모든 프로젝트는 학습 목적으로 제작되었습니다.</p>
+            </div>
+        </footer>
     </div>
 
     <script>
