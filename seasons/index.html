@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Four Seasons</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <!-- 계절 선택 버튼들 -->
+        <div class="season-selector">
+            <button class="season-btn" data-season="spring">
+                <span class="season-icon">🌸</span>
+                <span class="season-text">봄</span>
+            </button>
+            <button class="season-btn" data-season="summer">
+                <span class="season-icon">☀️</span>
+                <span class="season-text">여름</span>
+            </button>
+            <button class="season-btn" data-season="autumn">
+                <span class="season-icon">🍂</span>
+                <span class="season-text">가을</span>
+            </button>
+            <button class="season-btn" data-season="winter">
+                <span class="season-icon">❄️</span>
+                <span class="season-text">겨울</span>
+            </button>
+        </div>
+
+        <!-- 메인 컨텐츠 영역 -->
+        <div class="main-content">
+            <h1 class="season-title" id="seasonTitle">계절을 선택해주세요</h1>
+            <p class="season-description" id="seasonDescription">원하는 계절 버튼을 클릭하세요</p>
+            
+            <!-- 계절별 장식 요소들 -->
+            <div class="decorative-elements" id="decorativeElements">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </div>
+
+        <!-- 현재 선택된 계절 표시 -->
+        <div class="current-season-indicator" id="currentSeasonIndicator">
+            <span>현재 계절: </span>
+            <span id="currentSeasonText">없음</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
