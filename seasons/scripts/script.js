@@ -5,7 +5,10 @@ class SeasonManager {
         this.seasonTitle = document.getElementById('seasonTitle');
         this.seasonDescription = document.getElementById('seasonDescription');
         this.currentSeasonText = document.getElementById('currentSeasonText');
-        this.decorativeElements = document.getElementById('decorativeElements');
+        
+        // 애니메이션 관련 속성들
+        this.animationContainer = null;
+        this.animationIntervals = [];
         
         this.seasonData = {
             spring: {
@@ -39,11 +42,25 @@ class SeasonManager {
 
     init() {
         this.setupEventListeners();
-        this.createDecorativeElements();
         this.setupResizeHandler();
+        this.createAnimationContainer();
         
         // 웹소켓 연결 시도 (추후 확장용)
         // this.connectWebSocket();
+    }
+
+    createAnimationContainer() {
+        this.animationContainer = document.createElement('div');
+        this.animationContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        `;
+        this.container.appendChild(this.animationContainer);
     }
 
     setupEventListeners() {
@@ -77,6 +94,7 @@ class SeasonManager {
         // 기존 계절 클래스 제거
         if (this.currentSeason) {
             this.container.classList.remove(this.currentSeason);
+            this.stopSeasonAnimation();
         }
 
         // 새 계절 적용
@@ -88,9 +106,9 @@ class SeasonManager {
         
         // 컨텐츠 업데이트
         this.updateContent(season);
-        
-        // 장식 요소 업데이트
-        this.updateDecorativeElements(season);
+
+        // 계절별 애니메이션 시작
+        this.startSeasonAnimation(season);
 
         // 웹소켓으로 상태 전송 (추후 확장용)
         this.sendSeasonUpdate(season);
@@ -133,52 +151,112 @@ class SeasonManager {
         return korean[season] || '없음';
     }
 
-    createDecorativeElements() {
-        // 각 계절별 장식 요소들을 미리 생성
-        for (let i = 0; i < 20; i++) {
-            const element = document.createElement('div');
-            element.className = 'floating-decoration';
-            element.style.cssText = `
-                position: absolute;
-                width: ${Math.random() * 10 + 5}px;
-                height: ${Math.random() * 10 + 5}px;
-                border-radius: 50%;
-                opacity: 0;
-                animation-duration: ${Math.random() * 10 + 5}s;
-                animation-iteration-count: infinite;
-                animation-timing-function: linear;
-                left: ${Math.random() * 100}%;
-                top: ${Math.random() * 100}%;
-            `;
-            this.decorativeElements.appendChild(element);
+    startSeasonAnimation(season) {
+        this.clearFallingElements();
+        
+        switch(season) {
+            case 'spring':
+                this.createSpringAnimation();
+                break;
+            case 'summer':
+                this.createSummerAnimation();
+                break;
+            case 'autumn':
+                this.createAutumnAnimation();
+                break;
+            case 'winter':
+                this.createWinterAnimation();
+                break;
         }
     }
 
-    updateDecorativeElements(season) {
-        const elements = this.decorativeElements.querySelectorAll('.floating-decoration');
-        const colors = this.seasonData[season].colors;
-        
-        elements.forEach((element, index) => {
-            const color = colors[index % colors.length];
-            element.style.backgroundColor = color;
-            element.style.opacity = Math.random() * 0.7 + 0.3;
-            
-            // 계절별 애니메이션 적용
-            switch(season) {
-                case 'spring':
-                    element.style.animationName = 'floatingPetals';
-                    break;
-                case 'summer':
-                    element.style.animationName = 'sunRays';
-                    break;
-                case 'autumn':
-                    element.style.animationName = 'fallingLeaves';
-                    break;
-                case 'winter':
-                    element.style.animationName = 'snowfall';
-                    break;
-            }
-        });
+    stopSeasonAnimation() {
+        this.animationIntervals.forEach(interval => clearInterval(interval));
+        this.animationIntervals = [];
+        this.clearFallingElements();
+    }
+
+    clearFallingElements() {
+        if (this.animationContainer) {
+            this.animationContainer.innerHTML = '';
+        }
+    }
+
+    createSpringAnimation() {
+        const createPetal = () => {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.style.left = Math.random() * 100 + '%';
+            petal.style.animationDuration = (Math.random() * 6 + 8) + 's'; // 8-14초로 천천히
+            this.animationContainer.appendChild(petal);
+
+            setTimeout(() => {
+                if (petal.parentNode) {
+                    petal.remove();
+                }
+            }, parseFloat(petal.style.animationDuration) * 1000);
+        };
+
+        const petalInterval = setInterval(createPetal, 1200); // 1.2초마다 생성
+        this.animationIntervals.push(petalInterval);
+    }
+
+    createSummerAnimation() {
+        const createSunbeam = () => {
+            const sunbeam = document.createElement('div');
+            sunbeam.className = 'sunbeam';
+            sunbeam.style.left = Math.random() * 100 + '%';
+            sunbeam.style.animationDuration = (Math.random() * 5 + 7) + 's'; // 7-12초로 천천히
+            this.animationContainer.appendChild(sunbeam);
+
+            setTimeout(() => {
+                if (sunbeam.parentNode) {
+                    sunbeam.remove();
+                }
+            }, parseFloat(sunbeam.style.animationDuration) * 1000);
+        };
+
+        const sunbeamInterval = setInterval(createSunbeam, 800); // 0.8초마다 생성
+        this.animationIntervals.push(sunbeamInterval);
+    }
+
+    createAutumnAnimation() {
+        const createLeaf = () => {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.style.left = Math.random() * 100 + '%';
+            leaf.style.animationDuration = (Math.random() * 7 + 10) + 's'; // 10-17초로 가장 천천히
+            this.animationContainer.appendChild(leaf);
+
+            setTimeout(() => {
+                if (leaf.parentNode) {
+                    leaf.remove();
+                }
+            }, parseFloat(leaf.style.animationDuration) * 1000);
+        };
+
+        const leafInterval = setInterval(createLeaf, 1500); // 1.5초마다 생성
+        this.animationIntervals.push(leafInterval);
+    }
+
+    createWinterAnimation() {
+        const createSnowflake = () => {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.innerHTML = ['❄', '❅', '❆'][Math.floor(Math.random() * 3)];
+            snowflake.style.left = Math.random() * 100 + '%';
+            snowflake.style.animationDuration = (Math.random() * 6 + 9) + 's'; // 9-15초로 천천히
+            this.animationContainer.appendChild(snowflake);
+
+            setTimeout(() => {
+                if (snowflake.parentNode) {
+                    snowflake.remove();
+                }
+            }, parseFloat(snowflake.style.animationDuration) * 1000);
+        };
+
+        const snowInterval = setInterval(createSnowflake, 600); // 0.6초마다 생성
+        this.animationIntervals.push(snowInterval);
     }
 
     // 웹소켓 확장을 위한 메서드들
