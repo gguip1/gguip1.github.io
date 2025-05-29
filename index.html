@@ -137,7 +137,7 @@
     <div class="container">
         <header>
             <h1>🚀 개발자 포털</h1>
-            <p class="subtitle">토이 프로젝트 모음</p>
+            <!-- <p class="subtitle">토이 프로젝트 모음</p> -->
         </header>
 
         <div id="projects-container">
@@ -166,7 +166,7 @@
         // 프로젝트 카드 생성 함수
         function createProjectCard(project) {
             return `
-                <a href="${project.folder}/index.html" class="project-card">
+                <a href="${project.folder}/" class="project-card">
                     <div class="project-icon">${project.icon}</div>
                     <div class="project-title">${project.name}</div>
                     <div class="project-description">${project.description}</div>
@@ -201,15 +201,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkForNewProjects();
         });
-
-        // 예시 프로젝트 추가 (테스트용)
-        // projects.push({
-        //     name: "할 일 목록",
-        //     folder: "todo-list",
-        //     description: "React로 만든 할 일 관리 앱",
-        //     icon: "📝",
-        //     status: "개발중"
-        // });
     </script>
 </body>
 </html>
