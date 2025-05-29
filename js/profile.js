@@ -41,6 +41,10 @@ function renderProfile(data) {
             <div class="education-details">
                 <div class="education-school">${edu.school}</div>
                 <div class="education-major">${edu.major}${edu.degree ? ` (${edu.degree})` : ''}</div>
+                <div class="education-info">
+                    ${edu.gpa ? `<span class="education-gpa">학점: ${edu.gpa}</span>` : ''}
+                    ${edu.achievement ? `<span class="education-achievement">${edu.achievement}</span>` : ''}
+                </div>
             </div>
         </div>
     `).join('');

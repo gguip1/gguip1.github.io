@@ -814,16 +814,15 @@ h2 {
     position: relative;
     max-width: 900px;
     margin: 0 auto;
-    padding: 0;
     width: 100%;
     box-sizing: border-box;
+    padding: 0 3rem;
 }
 
 .project-viewport {
     overflow: hidden;
     position: relative;
-    margin: 0 2.5rem; /* 슬라이더 버튼을 위한 여백 */
-    width: auto;
+    width: 100%;
 }
 
 .project-list {
@@ -834,10 +833,9 @@ h2 {
 
 .project-card {
     min-width: 100%;
-    padding: 1.5rem;
+    flex: 0 0 100%;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
+    padding: 1.5rem;
 }
 
 .slider-button {
@@ -851,12 +849,13 @@ h2 {
     background: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     cursor: pointer;
-    color: var(--primary-color);
-    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 2;
 }
 
-slider-button.prev {
+.slider-button.prev {
     left: 0;
 }
 
@@ -864,32 +863,17 @@ slider-button.prev {
     right: 0;
 }
 
-.project-indicators {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-}
-
-.indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.indicator.active {
-    background: var(--primary-color);
-    transform: scale(1.2);
-}
-
 /* 모바일 대응 스타일 */
 @media (max-width: 768px) {
     .project-slider {
-        padding: 0 1.5rem;
-        margin: 0 -1rem;  /* 좌우 여백 상쇄 */
+        padding: 0 2rem;
+        margin: 0;
+        overflow: visible;
+    }
+
+    .project-viewport {
+        margin: 0;
+        padding: 0;
     }
 
     .project-card {
@@ -897,28 +881,30 @@ slider-button.prev {
     }
 
     .slider-button {
-        width: 32px;
-        height: 32px;
-        background: rgba(255, 255, 255, 0.9);
+        width: 36px;
+        height: 36px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
     .slider-button.prev {
-        left: -0.5rem;
+        left: -1rem;
     }
 
     .slider-button.next {
-        right: -0.5rem;
+        right: -1rem;
     }
 
-    .project-meta {
+    /* 프로젝트 카드 내부 요소 조정 */
+    .project-header {
         flex-direction: column;
         gap: 0.5rem;
         align-items: flex-start;
     }
 
-    .project-header {
-        flex-direction: column;
-        gap: 0.8rem;
+    .project-meta {
+        width: 100%;
+        justify-content: flex-start;
     }
 
     .project-roles {
@@ -926,17 +912,9 @@ slider-button.prev {
         gap: 0.5rem;
     }
 
-    .role-badge {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.8rem;
-    }
-
-    .project-description {
-        font-size: 0.9rem;
-    }
-
-    .project-highlights li {
-        font-size: 0.9rem;
+    .project-tags {
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .project-links {
@@ -948,47 +926,11 @@ slider-button.prev {
         width: 100%;
         justify-content: center;
     }
-
-    .project-indicators {
-        margin-top: 1.5rem;
-    }
-
-    .indicator {
-        width: 6px;
-        height: 6px;
-    }
 }
 
-/* 작은 모바일 화면 대응 */
 @media (max-width: 480px) {
     .project-slider {
-        padding: 0 1rem;
-    }
-
-    .slider-button {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
-    }
-
-    .project-card {
-        padding: 0.8rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .project-slider {
-        margin: 0;
-        padding: 0;
-        overflow: visible;
-    }
-
-    .project-viewport {
-        margin: 0 2rem; /* 버튼 공간 확보 */
-    }
-
-    .project-card {
-        padding: 1rem;
+        padding: 0 1.5rem;
     }
 
     .slider-button {
@@ -997,24 +939,19 @@ slider-button.prev {
     }
 
     .slider-button.prev {
-        left: 0;
+        left: -0.8rem;
     }
 
     .slider-button.next {
-        right: 0;
+        right: -0.8rem;
+    }
+
+    .project-card {
+        padding: 0.8rem;
     }
 }
 
-@media (max-width: 480px) {
-    .project-viewport {
-        margin: 0 1.5rem; /* 더 작은 화면에서 여백 조정 */
-    }
-
-    .slider-button {
-        width: 28px;
-        height: 28px;
-    }
-}
+/* 중복된 미디어 쿼리 제거 및 통합 */
 
 /* 프로젝트 미리보기 스타일 */
 .project-preview {
@@ -1175,4 +1112,34 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+.education-details {
+    flex: 1;
+}
+
+.education-info {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 0.2rem;
+}
+
+.education-gpa {
+    color: #1a73e8;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.education-achievement {
+    color: var(--secondary-color);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .education-info {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
 }

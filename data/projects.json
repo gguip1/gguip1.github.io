@@ -6,7 +6,7 @@
             "teamSize": 3,
             "subtitle": "AI 기반 식단 관리 애플리케이션",
             "tags": ["Kotlin", "Android", "Python", "Django", "Java", "Spring Boot", "Thymeleaf", "MySQL", "Azure", "Docker", "YOLO"],
-            "roles": ["PM", "Android Developer", "Backend Developer"],
+            "roles": ["Android Developer", "Backend Developer"],
             "description": "이미지 인식을 활용한 자동 식단 입력과 포인트 시스템을 통한 사용자 참여 유도를 제공하는 AI 기반 식단 관리 애플리케이션",
             "highlights": [
                 "AI를 활용한 자동 식단 기록 (이미지 및 텍스트 입력 지원)",
@@ -19,26 +19,6 @@
                 {
                     "url": "https://github.com/wku-team-potato",
                     "label": "GitHub Repository"
-                },
-                {
-                    "url": "https://github.com/wku-team-potato/N.M_FE",
-                    "label": "Android Application Repository"
-                },
-                {
-                    "url": "https://github.com/wku-team-potato/N.M_Manager",
-                    "label": "Admin Web Repository"
-                },
-                {
-                    "url": "https://github.com/wku-team-potato/N.M_BE",
-                    "label": "Backend Repository"
-                },
-                {
-                    "url": "https://github.com/wku-team-potato/N.M_AI_BE",
-                    "label": "AI Backend Repository"
-                },
-                {
-                    "url": "https://github.com/wku-team-potato/FoodDetectAI-YOLO",
-                    "label": "AI Model Training Repository"
                 }
             ]
         },
@@ -62,30 +42,6 @@
                 {
                     "url": "https://github.com/gguip1/TarotWithLLM",
                     "label": "GitHub Repository"
-                }
-            ]
-        },
-        {
-            "title": "문생추",
-            "period": "2025.02 - 2024.01",
-            "teamSize": 1,
-            "subtitle": "일정 공유 플랫폼",
-            "tags": ["React", "FastAPI", "PostgreSQL", "Docker"],
-            "roles": ["Full Stack Developer", "Project Lead", "DevOps Engineer"],
-            "description": "일일 계획을 수립하고 친구들과 공유할 수 있는 소셜 일정 관리 서비스",
-            "highlights": [
-                "소셜 기능이 통합된 일정 관리 시스템 설계",
-                "RESTful API 아키텍처 설계 및 구현",
-                "JWT 기반 사용자 인증 시스템 개발"
-            ],
-            "links": [
-                {
-                    "url": "https://github.com/gguip1/SprintDay",
-                    "label": "GitHub Repository"
-                },
-                {
-                    "url": "https://sprintday.example.com",
-                    "label": "Service Link"
                 }
             ]
         }

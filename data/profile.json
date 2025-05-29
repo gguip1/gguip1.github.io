@@ -21,19 +21,14 @@
             }
         ]
     },
-    "name": "이기용",
-    "title": "백엔드 개발자",
-    "contact": {
-        "email": "gguip7554@naver.com",
-        "github": "github.com/gguip1"
-    },
     "introduction": "사용자 중심의 서비스 개발과 안정적인 시스템 구축에 전문성을 가진 백엔드 개발자입니다. 지속적인 학습과 성장을 추구하며, 효율적인 코드 작성과 시스템 최적화에 깊은 관심을 가지고 있습니다.",
     "education": [
         {
             "school": "원광대학교",
             "major": "컴퓨터소프트웨어공학과",
             "degree": "학사",
-            "period": "2019.03 - 2025.02"
+            "period": "2019.03 - 2025.02",
+            "gpa": "4.27/4.5"
         }
     ],
     "certifications": [
