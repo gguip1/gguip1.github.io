@@ -41,12 +41,27 @@ class SeasonManager {
     }
 
     init() {
+        this.setupMobileOptimization();
         this.setupEventListeners();
         this.setupResizeHandler();
         this.createAnimationContainer();
         
         // 웹소켓 연결 시도 (추후 확장용)
         // this.connectWebSocket();
+    }
+
+    setupMobileOptimization() {
+        // 모바일에서 주소창 숨김을 위한 높이 조정
+        const setVH = () => {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+        
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(setVH, 100);
+        });
     }
 
     createAnimationContainer() {
@@ -59,6 +74,7 @@ class SeasonManager {
             height: 100%;
             pointer-events: none;
             z-index: 2;
+            overflow: hidden;
         `;
         this.container.appendChild(this.animationContainer);
     }
@@ -186,10 +202,17 @@ class SeasonManager {
         const createPetal = () => {
             const petal = document.createElement('div');
             petal.className = 'petal';
-            petal.style.left = Math.random() * 100 + '%';
-            petal.style.animationDuration = (Math.random() * 6 + 8) + 's'; // 8-14초로 천천히
+            
+            // 고정된 색상 클래스 할당
+            const colorClasses = ['color1', 'color2', 'color3'];
+            const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            petal.classList.add(randomColor);
+            
+            petal.style.left = Math.random() * 90 + 5 + '%'; // 5-95% 범위로 제한
+            petal.style.animationDuration = (Math.random() * 6 + 8) + 's';
             this.animationContainer.appendChild(petal);
 
+            // 애니메이션 완료 후 제거
             setTimeout(() => {
                 if (petal.parentNode) {
                     petal.remove();
@@ -197,7 +220,7 @@ class SeasonManager {
             }, parseFloat(petal.style.animationDuration) * 1000);
         };
 
-        const petalInterval = setInterval(createPetal, 1200); // 1.2초마다 생성
+        const petalInterval = setInterval(createPetal, 1200);
         this.animationIntervals.push(petalInterval);
     }
 
@@ -205,8 +228,14 @@ class SeasonManager {
         const createSunbeam = () => {
             const sunbeam = document.createElement('div');
             sunbeam.className = 'sunbeam';
-            sunbeam.style.left = Math.random() * 100 + '%';
-            sunbeam.style.animationDuration = (Math.random() * 5 + 7) + 's'; // 7-12초로 천천히
+            
+            // 고정된 색상 클래스 할당
+            const colorClasses = ['color1', 'color2', 'color3'];
+            const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            sunbeam.classList.add(randomColor);
+            
+            sunbeam.style.left = Math.random() * 90 + 5 + '%';
+            sunbeam.style.animationDuration = (Math.random() * 5 + 7) + 's';
             this.animationContainer.appendChild(sunbeam);
 
             setTimeout(() => {
@@ -216,7 +245,7 @@ class SeasonManager {
             }, parseFloat(sunbeam.style.animationDuration) * 1000);
         };
 
-        const sunbeamInterval = setInterval(createSunbeam, 800); // 0.8초마다 생성
+        const sunbeamInterval = setInterval(createSunbeam, 800);
         this.animationIntervals.push(sunbeamInterval);
     }
 
@@ -224,8 +253,14 @@ class SeasonManager {
         const createLeaf = () => {
             const leaf = document.createElement('div');
             leaf.className = 'leaf';
-            leaf.style.left = Math.random() * 100 + '%';
-            leaf.style.animationDuration = (Math.random() * 7 + 10) + 's'; // 10-17초로 가장 천천히
+            
+            // 고정된 색상 클래스 할당
+            const colorClasses = ['color1', 'color2', 'color3'];
+            const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            leaf.classList.add(randomColor);
+            
+            leaf.style.left = Math.random() * 90 + 5 + '%';
+            leaf.style.animationDuration = (Math.random() * 7 + 10) + 's';
             this.animationContainer.appendChild(leaf);
 
             setTimeout(() => {
@@ -235,7 +270,7 @@ class SeasonManager {
             }, parseFloat(leaf.style.animationDuration) * 1000);
         };
 
-        const leafInterval = setInterval(createLeaf, 1500); // 1.5초마다 생성
+        const leafInterval = setInterval(createLeaf, 1500);
         this.animationIntervals.push(leafInterval);
     }
 
@@ -244,8 +279,8 @@ class SeasonManager {
             const snowflake = document.createElement('div');
             snowflake.className = 'snowflake';
             snowflake.innerHTML = ['❄', '❅', '❆'][Math.floor(Math.random() * 3)];
-            snowflake.style.left = Math.random() * 100 + '%';
-            snowflake.style.animationDuration = (Math.random() * 6 + 9) + 's'; // 9-15초로 천천히
+            snowflake.style.left = Math.random() * 90 + 5 + '%';
+            snowflake.style.animationDuration = (Math.random() * 6 + 9) + 's';
             this.animationContainer.appendChild(snowflake);
 
             setTimeout(() => {
@@ -255,7 +290,7 @@ class SeasonManager {
             }, parseFloat(snowflake.style.animationDuration) * 1000);
         };
 
-        const snowInterval = setInterval(createSnowflake, 600); // 0.6초마다 생성
+        const snowInterval = setInterval(createSnowflake, 600);
         this.animationIntervals.push(snowInterval);
     }
 

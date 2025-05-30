@@ -343,18 +343,20 @@ body {
     border-radius: 50% 0 50% 0;
     opacity: 0.8;
     animation: petalFall linear;
+    /* 애니메이션이 완료될 때까지 요소 유지 */
+    animation-fill-mode: forwards;
 }
 
 .petal.color1 {
-    background: #ff69b4;
+    background: #ff69b4 !important;
 }
 
 .petal.color2 {
-    background: #ffb6c1;
+    background: #ffb6c1 !important;
 }
 
 .petal.color3 {
-    background: #ffc0cb;
+    background: #ffc0cb !important;
 }
 
 /* 여름 햇빛 애니메이션 */
@@ -367,18 +369,22 @@ body {
     opacity: 0.9;
     animation: sunbeamFall linear;
     box-shadow: 0 0 6px rgba(255, 235, 59, 0.6);
+    animation-fill-mode: forwards;
 }
 
 .sunbeam.color1 {
-    background: radial-gradient(circle, #ffeb3b 20%, #ffc107 70%);
+    background: radial-gradient(circle, #ffeb3b 20%, #ffc107 70%) !important;
+    box-shadow: 0 0 6px rgba(255, 235, 59, 0.6) !important;
 }
 
 .sunbeam.color2 {
-    background: radial-gradient(circle, #ffd700 20%, #ffb347 70%);
+    background: radial-gradient(circle, #ffd700 20%, #ffb347 70%) !important;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.6) !important;
 }
 
 .sunbeam.color3 {
-    background: radial-gradient(circle, #fff700 20%, #ffa500 70%);
+    background: radial-gradient(circle, #fff700 20%, #ffa500 70%) !important;
+    box-shadow: 0 0 6px rgba(255, 247, 0, 0.6) !important;
 }
 
 /* 가을 낙엽 애니메이션 */
@@ -390,21 +396,22 @@ body {
     border-radius: 0 100% 0 100%;
     opacity: 0.9;
     animation: leafFall linear;
+    animation-fill-mode: forwards;
 }
 
 .leaf.color1 {
-    background: #d2691e;
-    border-radius: 0 100% 0 100%;
+    background: #d2691e !important;
+    border-radius: 0 100% 0 100% !important;
 }
 
 .leaf.color2 {
-    background: #cd853f;
-    border-radius: 100% 0 100% 0;
+    background: #cd853f !important;
+    border-radius: 100% 0 100% 0 !important;
 }
 
 .leaf.color3 {
-    background: #ff4500;
-    border-radius: 50% 0 50% 50%;
+    background: #ff4500 !important;
+    border-radius: 50% 0 50% 50% !important;
 }
 
 /* 겨울 눈 애니메이션 */
@@ -415,6 +422,7 @@ body {
     opacity: 0.9;
     animation: snowFall linear;
     text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    animation-fill-mode: forwards;
 }
 
 /* 애니메이션 키프레임들 - 화면 밖으로 나가지 않도록 수정 */
@@ -497,19 +505,16 @@ body {
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-    /* 모바일에서 자연스러운 높이 설정 */
+    /* 모바일에서 자연스러운 스크롤 허용 */
     html {
-        height: 100vh;
-        height: -webkit-fill-available;
-        height: calc(var(--vh, 1vh) * 100);
+        height: auto;
+        min-height: 100vh;
     }
     
     body {
         height: auto;
         min-height: 100vh;
-        min-height: -webkit-fill-available;
-        min-height: calc(var(--vh, 1vh) * 100);
-        /* 세로 스크롤만 허용하여 새로고침 가능 */
+        /* 자연스러운 스크롤 허용 */
         overflow-x: hidden;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -518,8 +523,6 @@ body {
     .container {
         height: auto;
         min-height: 100vh;
-        min-height: -webkit-fill-available;
-        min-height: calc(var(--vh, 1vh) * 100);
         /* 애니메이션 요소만 숨김 */
         overflow: hidden;
         position: relative;
@@ -589,16 +592,13 @@ body {
 
 @media (max-width: 480px) {
     html {
-        height: 100vh;
-        height: -webkit-fill-available;
-        height: calc(var(--vh, 1vh) * 100);
+        height: auto;
+        min-height: 100vh;
     }
     
     body {
         height: auto;
         min-height: 100vh;
-        min-height: -webkit-fill-available;
-        min-height: calc(var(--vh, 1vh) * 100);
         overflow-x: hidden;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -607,8 +607,6 @@ body {
     .container {
         height: auto;
         min-height: 100vh;
-        min-height: -webkit-fill-available;
-        min-height: calc(var(--vh, 1vh) * 100);
         overflow: hidden;
     }
     
@@ -664,8 +662,8 @@ body {
 @supports (-webkit-touch-callout: none) {
     body {
         -webkit-overflow-scrolling: touch;
-        /* 당겨서 새로고침 허용 */
-        overscroll-behavior-y: auto;
+        /* 자연스러운 스크롤 허용 */
+        overflow-y: auto;
     }
     
     .season-btn {
