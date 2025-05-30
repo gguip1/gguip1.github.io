@@ -298,7 +298,7 @@ class SeasonManager {
     connectWebSocket() {
         try {
             // 추후 웹소켓 서버 URL 설정
-            this.websocket = new WebSocket('ws://female-tabby-gguip1-019595cf.koyeb.app/seasons');
+            this.websocket = new WebSocket('wss://female-tabby-gguip1-019595cf.koyeb.app/seasons');
             
             this.websocket.onopen = () => {
                 this.isConnected = true;
