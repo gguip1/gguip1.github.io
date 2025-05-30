@@ -47,7 +47,7 @@ class SeasonManager {
         this.createAnimationContainer();
         
         // 웹소켓 연결 시도 (추후 확장용)
-        // this.connectWebSocket();
+        this.connectWebSocket();
     }
 
     setupMobileOptimization() {
@@ -146,7 +146,7 @@ class SeasonManager {
         // 애니메이션과 함께 컨텐츠 변경
         this.seasonTitle.style.opacity = '0';
         this.seasonDescription.style.opacity = '0';
-        
+
         setTimeout(() => {
             this.seasonTitle.textContent = data.title;
             this.seasonDescription.textContent = data.description;
@@ -298,24 +298,24 @@ class SeasonManager {
     connectWebSocket() {
         try {
             // 추후 웹소켓 서버 URL 설정
-            // this.websocket = new WebSocket('ws://localhost:8080');
+            this.websocket = new WebSocket('ws://female-tabby-gguip1-019595cf.koyeb.app/seasons');
             
-            // this.websocket.onopen = () => {
-            //     this.isConnected = true;
-            //     console.log('WebSocket 연결됨');
-            // };
+            this.websocket.onopen = () => {
+                this.isConnected = true;
+                console.log('WebSocket 연결됨');
+            };
 
-            // this.websocket.onmessage = (event) => {
-            //     const data = JSON.parse(event.data);
-            //     if (data.type === 'seasonChange') {
-            //         this.changeSeason(data.season);
-            //     }
-            // };
+            this.websocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'seasonChange') {
+                    this.changeSeason(data.season);
+                }
+            };
 
-            // this.websocket.onclose = () => {
-            //     this.isConnected = false;
-            //     console.log('WebSocket 연결 종료');
-            // };
+            this.websocket.onclose = () => {
+                this.isConnected = false;
+                console.log('WebSocket 연결 종료');
+            };
         } catch (error) {
             console.log('WebSocket 연결 실패:', error);
         }
