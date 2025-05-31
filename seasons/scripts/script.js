@@ -104,7 +104,7 @@ class SeasonManager {
         });
     }
 
-    changeSeason(season) {
+    changeSeason(season, skipSend = false) {
         if (this.currentSeason === season) return;
 
         // 기존 계절 클래스 제거
@@ -127,7 +127,9 @@ class SeasonManager {
         this.startSeasonAnimation(season);
 
         // 웹소켓으로 상태 전송 (추후 확장용)
-        this.sendSeasonUpdate(season);
+        if (!skipSend){
+            this.sendSeasonUpdate(season);
+        }
     }
 
     updateButtonStates(activeSeason) {
@@ -308,7 +310,7 @@ class SeasonManager {
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.type === 'seasonUpdate') {
-                    this.changeSeason(data.season);
+                    this.changeSeason(data.season, true);
                 }
             };
 
