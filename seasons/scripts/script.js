@@ -307,7 +307,7 @@ class SeasonManager {
 
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.type === 'seasonChange') {
+                if (data.type === 'seasonUpdate') {
                     this.changeSeason(data.season);
                 }
             };
@@ -325,7 +325,7 @@ class SeasonManager {
         // 웹소켓이 연결되어 있다면 서버로 상태 전송
         if (this.websocket && this.isConnected) {
             const message = {
-                type: 'seasonChange',
+                type: 'changeRequest',
                 season: season,
                 timestamp: new Date().toISOString()
             };
