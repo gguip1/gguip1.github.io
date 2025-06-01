@@ -281,18 +281,6 @@
                 projectsGrid.innerHTML = projects.map(createProjectCard).join('');
             }
         }
-
-        // 자동으로 프로젝트 폴더 감지 (실제 파일시스템 접근 불가능하므로 수동 관리)
-        function checkForNewProjects() {
-            // 웹에서는 파일시스템에 직접 접근할 수 없으므로
-            // 프로젝트는 수동으로 projects 배열에 추가해야 합니다
-            renderProjects();
-        }
-
-        // 페이지 로드 시 실행
-        document.addEventListener('DOMContentLoaded', function() {
-            checkForNewProjects();
-        });
     </script>
 </body>
 </html>
