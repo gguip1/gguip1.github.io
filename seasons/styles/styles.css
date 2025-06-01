@@ -1,6 +1,7 @@
 /* CSS 변수를 사용한 모바일 높이 조정 */
 :root {
     --vh: 1vh;
+    --dynamic-bottom: 30px;
 }
 
 * {
@@ -108,10 +109,60 @@ body {
     transition: all 0.5s ease;
 }
 
+/* 연결 상태 표시 */
+.connection-status-indicator {
+    position: fixed;
+    bottom: var(--dynamic-bottom);
+    left: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 25px;
+    color: white;
+    font-weight: bold;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: bottom 0.3s ease-in-out, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 연결 상태 점 */
+.connection-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.connection-dot.connected {
+    background-color: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+    animation: pulse 2s infinite;
+}
+
+.connection-dot.disconnected {
+    background-color: #f44336;
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.6);
+}
+
+/* 펄스 애니메이션 */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 16px rgba(76, 175, 80, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+    }
+}
+
 /* 현재 계절 표시 */
 .current-season-indicator {
-    position: absolute;
-    bottom: 30px;
+    position: fixed;
+    bottom: var(--dynamic-bottom);
     right: 30px;
     background: rgba(255, 255, 255, 0.2);
     padding: 10px 20px;
@@ -119,6 +170,16 @@ body {
     color: white;
     font-weight: bold;
     backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: bottom 0.3s ease-in-out, transform 0.2s ease;
+}
+
+/* Safe area 지원 */
+@supports (bottom: env(safe-area-inset-bottom)) {
+    .connection-status-indicator,
+    .current-season-indicator {
+        bottom: max(var(--dynamic-bottom), calc(15px + env(safe-area-inset-bottom)));
+    }
 }
 
 /* 봄 테마 */
@@ -505,6 +566,10 @@ body {
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
+    :root {
+        --dynamic-bottom: 20px;
+    }
+    
     /* 모바일에서 자연스러운 스크롤 허용 */
     html {
         height: auto;
@@ -564,10 +629,21 @@ body {
     }
     
     .current-season-indicator {
-        bottom: 15px;
+        bottom: var(--dynamic-bottom);
         right: 15px;
         padding: 8px 15px;
         font-size: 0.9rem;
+        z-index: 1001;
+        transition: bottom 0.25s ease-in-out, transform 0.15s ease;
+    }
+    
+    .connection-status-indicator {
+        bottom: var(--dynamic-bottom);
+        left: 15px;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        z-index: 1001;
+        transition: bottom 0.25s ease-in-out, transform 0.15s ease;
     }
     
     .petal {
@@ -591,6 +667,10 @@ body {
 }
 
 @media (max-width: 480px) {
+    :root {
+        --dynamic-bottom: 15px;
+    }
+    
     html {
         height: auto;
         min-height: 100vh;
@@ -638,6 +718,27 @@ body {
         padding: 0 20px;
     }
     
+    .current-season-indicator {
+        bottom: var(--dynamic-bottom);
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        z-index: 1001;
+    }
+    
+    .connection-status-indicator {
+        bottom: var(--dynamic-bottom);
+        left: 10px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        z-index: 1001;
+    }
+    
+    .connection-dot {
+        width: 6px;
+        height: 6px;
+    }
+    
     .petal {
         width: 8px;
         height: 8px;
@@ -660,6 +761,10 @@ body {
 
 /* iOS Safari 최적화 */
 @supports (-webkit-touch-callout: none) {
+    :root {
+        --dynamic-bottom: 35px;
+    }
+    
     body {
         -webkit-overflow-scrolling: touch;
         /* 자연스러운 스크롤 허용 */
@@ -669,4 +774,26 @@ body {
     .season-btn {
         -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
     }
+    
+    .connection-status-indicator,
+    .current-season-indicator {
+        bottom: max(var(--dynamic-bottom), calc(20px + env(safe-area-inset-bottom, 15px)));
+    }
+}
+
+/* 동적 조정을 위한 클래스들 */
+.connection-status-indicator.has-bottom-bar,
+.current-season-indicator.has-bottom-bar {
+    --dynamic-bottom: 80px;
+    transform: translateY(0);
+}
+
+.connection-status-indicator.no-bottom-bar,
+.current-season-indicator.no-bottom-bar {
+    transform: translateY(0);
+}
+
+.connection-status-indicator.landscape-mode,
+.current-season-indicator.landscape-mode {
+    --dynamic-bottom: 60px;
 }

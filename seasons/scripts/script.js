@@ -5,11 +5,20 @@ class SeasonManager {
         this.seasonTitle = document.getElementById('seasonTitle');
         this.seasonDescription = document.getElementById('seasonDescription');
         this.currentSeasonText = document.getElementById('currentSeasonText');
-        
+        this.connectionDot = document.getElementById('connectionDot');
+        this.connectionText = document.getElementById('connectionText');
+
         // 애니메이션 관련 속성들
         this.animationContainer = null;
         this.animationIntervals = [];
-        
+
+        // 뷰포트 상태 추적
+        this.lastViewportHeight = window.innerHeight;
+        this.resizeTimer = null;
+
+        // 연결 상태 추적
+        this.connectionCount = 0;
+
         this.seasonData = {
             spring: {
                 title: '봄이 왔어요! 🌸',
@@ -36,7 +45,7 @@ class SeasonManager {
         // 웹소켓 확장을 위한 준비
         this.websocket = null;
         this.isConnected = false;
-        
+
         this.init();
     }
 
@@ -45,8 +54,12 @@ class SeasonManager {
         this.setupEventListeners();
         this.setupResizeHandler();
         this.createAnimationContainer();
-        
-        // 웹소켓 연결 시도 (추후 확장용)
+        this.setupIndicatorPositioning();
+
+        // 초기 상태는 연결 끊김
+        this.updateConnectionStatus(false, 0);
+
+        // 웹소켓 연결 시도
         this.connectWebSocket();
     }
 
@@ -56,11 +69,144 @@ class SeasonManager {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
         };
-        
+
         setVH();
         window.addEventListener('resize', setVH);
         window.addEventListener('orientationchange', () => {
-            setTimeout(setVH, 100);
+            setTimeout(() => {
+                setVH();
+                this.adjustIndicatorPosition();
+            }, 100);
+        });
+    }
+
+    setupIndicatorPositioning() {
+        // 스크롤 이벤트로 브라우저 UI 변화 감지
+        let scrollTimer = null;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(() => {
+                this.adjustIndicatorPosition();
+            }, 50);
+        });
+
+        // Visual Viewport API 지원 브라우저에서 사용
+        if ('visualViewport' in window) {
+            window.visualViewport.addEventListener('resize', () => {
+                this.adjustIndicatorPosition();
+            });
+        }
+    }
+
+    adjustIndicatorPosition() {
+        const seasonIndicator = document.getElementById('currentSeasonIndicator');
+        const connectionIndicator = document.getElementById('connectionStatusIndicator');
+        
+        if (!seasonIndicator || !connectionIndicator) return;
+
+        const currentViewportHeight = window.innerHeight;
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const isMobile = window.innerWidth <= 768;
+        
+        // 브라우저 UI 상태 감지
+        const hasBottomBar = this.detectBottomBar(currentViewportHeight);
+        
+        // 기존 클래스 제거
+        [seasonIndicator, connectionIndicator].forEach(indicator => {
+            indicator.classList.remove('has-bottom-bar', 'no-bottom-bar', 'landscape-mode');
+        });
+        
+        if (isMobile) {
+            let bottomValue;
+            
+            if (isLandscape) {
+                // 가로 모드
+                [seasonIndicator, connectionIndicator].forEach(indicator => {
+                    indicator.classList.add('landscape-mode');
+                });
+                bottomValue = '60px';
+            } else if (hasBottomBar) {
+                // 세로 모드 + 브라우저 바 있음
+                [seasonIndicator, connectionIndicator].forEach(indicator => {
+                    indicator.classList.add('has-bottom-bar');
+                });
+                bottomValue = Math.max(80, currentViewportHeight * 0.12) + 'px';
+            } else {
+                // 세로 모드 + 브라우저 바 없음
+                [seasonIndicator, connectionIndicator].forEach(indicator => {
+                    indicator.classList.add('no-bottom-bar');
+                });
+                bottomValue = window.innerWidth <= 480 ? '15px' : '20px';
+            }
+            
+            // CSS 커스텀 프로퍼티로 동적 값 설정
+            document.documentElement.style.setProperty('--dynamic-bottom', bottomValue);
+        }
+
+        // 이전 높이 업데이트
+        this.lastViewportHeight = currentViewportHeight;
+    }
+
+    detectBottomBar(viewportHeight) {
+        // 다양한 방법으로 브라우저 하단 바 감지
+        const screenHeight = window.screen.height;
+        const heightRatio = viewportHeight / screenHeight;
+        const heightDifference = screenHeight - viewportHeight;
+        
+        // Android Chrome 등에서 하단 바가 있을 때의 특징
+        const hasSignificantHeightDifference = heightDifference > 100;
+        const hasLowHeightRatio = heightRatio < 0.85;
+        
+        // iOS Safari에서의 감지
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const hasIOSBar = isIOS && heightDifference > 50;
+        
+        return hasSignificantHeightDifference || hasLowHeightRatio || hasIOSBar;
+    }
+
+    updateConnectionStatus(isConnected, userCount = 0) {
+        if (!this.connectionDot || !this.connectionText) return;
+
+        this.connectionCount = userCount;
+        
+        if (isConnected) {
+            this.connectionDot.className = 'connection-dot connected';
+            this.connectionText.textContent = `사용자 수: ${userCount}`;
+        } else {
+            this.connectionDot.className = 'connection-dot disconnected';
+            this.connectionText.textContent = '연결 끊김';
+        }
+    }
+
+    setupEventListeners() {
+        const seasonButtons = document.querySelectorAll('.season-btn');
+        seasonButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const season = e.currentTarget.dataset.season;
+                this.changeSeason(season);
+            });
+        });
+    }
+
+    setupResizeHandler() {
+        window.addEventListener('resize', () => {
+            // 리사이즈 디바운싱
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = setTimeout(() => {
+                // 리사이즈 시 트랜지션 일시 중단
+                this.disableTransitions();
+
+                // 강제로 리플로우 실행
+                this.container.offsetHeight;
+
+                // 위치 조정
+                this.adjustIndicatorPosition();
+
+                // 다음 프레임에서 트랜지션 복원
+                requestAnimationFrame(() => {
+                    this.enableTransitions();
+                });
+            }, 100);
         });
     }
 
@@ -79,31 +225,6 @@ class SeasonManager {
         this.container.appendChild(this.animationContainer);
     }
 
-    setupEventListeners() {
-        const seasonButtons = document.querySelectorAll('.season-btn');
-        seasonButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const season = e.currentTarget.dataset.season;
-                this.changeSeason(season);
-            });
-        });
-    }
-
-    setupResizeHandler() {
-        window.addEventListener('resize', () => {
-            // 리사이즈 시 트랜지션 일시 중단
-            this.disableTransitions();
-            
-            // 강제로 리플로우 실행
-            this.container.offsetHeight;
-            
-            // 다음 프레임에서 트랜지션 복원
-            requestAnimationFrame(() => {
-                this.enableTransitions();
-            });
-        });
-    }
-
     changeSeason(season, skipSend = false) {
         if (this.currentSeason === season) return;
 
@@ -116,10 +237,10 @@ class SeasonManager {
         // 새 계절 적용
         this.currentSeason = season;
         this.container.classList.add(season);
-        
+
         // 버튼 상태 업데이트
         this.updateButtonStates(season);
-        
+
         // 컨텐츠 업데이트
         this.updateContent(season);
 
@@ -127,7 +248,7 @@ class SeasonManager {
         this.startSeasonAnimation(season);
 
         // 웹소켓으로 상태 전송 (추후 확장용)
-        if (!skipSend){
+        if (!skipSend) {
             this.sendSeasonUpdate(season);
         }
     }
@@ -144,7 +265,7 @@ class SeasonManager {
 
     updateContent(season) {
         const data = this.seasonData[season];
-        
+
         // 애니메이션과 함께 컨텐츠 변경
         this.seasonTitle.style.opacity = '0';
         this.seasonDescription.style.opacity = '0';
@@ -153,7 +274,7 @@ class SeasonManager {
             this.seasonTitle.textContent = data.title;
             this.seasonDescription.textContent = data.description;
             this.currentSeasonText.textContent = this.getSeasonKorean(season);
-            
+
             this.seasonTitle.style.opacity = '1';
             this.seasonDescription.style.opacity = '1';
         }, 300);
@@ -171,8 +292,8 @@ class SeasonManager {
 
     startSeasonAnimation(season) {
         this.clearFallingElements();
-        
-        switch(season) {
+
+        switch (season) {
             case 'spring':
                 this.createSpringAnimation();
                 break;
@@ -204,12 +325,12 @@ class SeasonManager {
         const createPetal = () => {
             const petal = document.createElement('div');
             petal.className = 'petal';
-            
+
             // 고정된 색상 클래스 할당
             const colorClasses = ['color1', 'color2', 'color3'];
             const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
             petal.classList.add(randomColor);
-            
+
             petal.style.left = Math.random() * 90 + 5 + '%'; // 5-95% 범위로 제한
             petal.style.animationDuration = (Math.random() * 6 + 8) + 's';
             this.animationContainer.appendChild(petal);
@@ -230,12 +351,12 @@ class SeasonManager {
         const createSunbeam = () => {
             const sunbeam = document.createElement('div');
             sunbeam.className = 'sunbeam';
-            
+
             // 고정된 색상 클래스 할당
             const colorClasses = ['color1', 'color2', 'color3'];
             const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
             sunbeam.classList.add(randomColor);
-            
+
             sunbeam.style.left = Math.random() * 90 + 5 + '%';
             sunbeam.style.animationDuration = (Math.random() * 5 + 7) + 's';
             this.animationContainer.appendChild(sunbeam);
@@ -255,12 +376,12 @@ class SeasonManager {
         const createLeaf = () => {
             const leaf = document.createElement('div');
             leaf.className = 'leaf';
-            
+
             // 고정된 색상 클래스 할당
             const colorClasses = ['color1', 'color2', 'color3'];
             const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
             leaf.classList.add(randomColor);
-            
+
             leaf.style.left = Math.random() * 90 + 5 + '%';
             leaf.style.animationDuration = (Math.random() * 7 + 10) + 's';
             this.animationContainer.appendChild(leaf);
@@ -301,25 +422,48 @@ class SeasonManager {
         try {
             // 추후 웹소켓 서버 URL 설정
             this.websocket = new WebSocket('wss://female-tabby-gguip1-019595cf.koyeb.app/seasons');
-            
+
             this.websocket.onopen = () => {
                 this.isConnected = true;
                 console.log('WebSocket 연결됨');
+                this.updateConnectionStatus(true, this.connectionCount);
             };
 
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
+                
+                // 각 타입을 독립적으로 처리
                 if (data.type === 'seasonUpdate') {
                     this.changeSeason(data.season, true);
+                }
+                
+                if (data.type === 'connectionCount') {
+                    // ConnectionCountDto에서 count 필드 사용
+                    this.updateConnectionStatus(this.isConnected, data.connectionCount);
                 }
             };
 
             this.websocket.onclose = () => {
                 this.isConnected = false;
                 console.log('WebSocket 연결 종료');
+                this.updateConnectionStatus(false, 0);
+                
+                // 재연결 시도 (5초 후)
+                setTimeout(() => {
+                    if (!this.isConnected) {
+                        console.log('WebSocket 재연결 시도...');
+                        this.connectWebSocket();
+                    }
+                }, 5000);
+            };
+
+            this.websocket.onerror = (error) => {
+                console.log('WebSocket 오류:', error);
+                this.updateConnectionStatus(false, 0);
             };
         } catch (error) {
             console.log('WebSocket 연결 실패:', error);
+            this.updateConnectionStatus(false, 0);
         }
     }
 
@@ -333,7 +477,7 @@ class SeasonManager {
             };
             this.websocket.send(JSON.stringify(message));
         }
-        
+
         // 로컬 스토리지에도 저장
         localStorage.setItem('currentSeason', season);
     }
@@ -349,7 +493,7 @@ class SeasonManager {
     disableTransitions() {
         document.body.style.transition = 'none';
         this.container.style.transition = 'none';
-        
+
         // 모든 계절별 요소들의 트랜지션도 비활성화
         const allElements = document.querySelectorAll('*');
         allElements.forEach(element => {
@@ -360,7 +504,7 @@ class SeasonManager {
     enableTransitions() {
         document.body.style.transition = '';
         this.container.style.transition = '';
-        
+
         // 모든 요소들의 트랜지션 복원
         const allElements = document.querySelectorAll('*');
         allElements.forEach(element => {
