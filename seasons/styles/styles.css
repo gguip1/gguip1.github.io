@@ -84,7 +84,7 @@ body {
 .season-text {
     font-size: 1.1rem;
     font-weight: bold;
-    color: white;
+    color: rgb(36, 26, 26);;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -117,7 +117,7 @@ body {
     background: rgba(255, 255, 255, 0.2);
     padding: 10px 20px;
     border-radius: 25px;
-    color: white;
+    color: rgb(36, 26, 26);
     font-weight: bold;
     backdrop-filter: blur(10px);
     z-index: 1000;
@@ -167,7 +167,7 @@ body {
     background: rgba(255, 255, 255, 0.2);
     padding: 10px 20px;
     border-radius: 25px;
-    color: white;
+    color: rgb(36, 26, 26);
     font-weight: bold;
     backdrop-filter: blur(10px);
     z-index: 1000;
