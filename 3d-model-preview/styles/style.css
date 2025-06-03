@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a1a;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+#container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+#canvas-container {
+    width: 100%;
+    height: 100%;
+}
+
+#controls-panel {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 250px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#controls-panel h3 {
+    margin-bottom: 15px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.control-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.control-group label {
+    font-size: 14px;
+    color: #cccccc;
+}
+
+.control-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #4CAF50;
+}
+
+.control-group input[type="color"] {
+    width: 40px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.control-group input[type="range"] {
+    width: 100px;
+    accent-color: #4CAF50;
+}
+
+#loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #ffffff;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading p {
+    font-size: 16px;
+    color: #cccccc;
+}
+
+#effects-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 200px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+#effects-panel h3 {
+    margin-bottom: 15px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.effect-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.effect-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.effect-group h4 {
+    margin-bottom: 10px;
+    color: #cccccc;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.effect-btn {
+    display: block;
+    width: 100%;
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.effect-btn:hover {
+    background: rgba(76, 175, 80, 0.3);
+    transform: translateY(-1px);
+}
+
+.effect-btn.active {
+    background: #4CAF50;
+    color: white;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+    font-weight: bold;
+    transform: translateY(-1px);
+}
+
+.effect-btn[data-effect="pulse"].active {
+    background: #4CAF50;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+@keyframes pulse-btn {
+    0% { box-shadow: 0 0 10px rgba(0, 188, 212, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 188, 212, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(0, 188, 212, 0.5); }
+}
+
+.effect-btn.clear-effects {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border-color: #f44336;
+}
+
+.effect-btn.clear-effects:hover {
+    background: rgba(244, 67, 54, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .effect-btn {
+        transition: none;
+    }
+    
+    .spinner {
+        animation: none;
+    }
+}
+
+/* 모바일 환경에서 패널 숨기기 */
+@media (max-width: 768px) {
+    #effects-panel,
+    #controls-panel {
+        display: none;
+    }
+}
+
+/* 터치 디바이스에서 패널 숨기기 */
+@media (hover: none) and (pointer: coarse) {
+    #effects-panel,
+    #controls-panel {
+        display: none;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #0a0a0a;
+    }
+    
+    #effects-panel,
+    #controls-panel {
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+}
