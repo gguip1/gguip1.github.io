@@ -1,0 +1,16 @@
+{
+    "models": [
+        {
+            "name": "Blade of Lumina",
+            "path": "./assets/Blade_of_Lumina.glb",
+            "description": "A radiant sword that channels the light of the stars.",
+            "category": "weapon"
+        },
+        {
+            "name": "Wooden_Practice_Sword",
+            "path": "./assets/Wooden_Practice_Sword.glb",
+            "description": "A simple wooden sword used for training.",
+            "category": "weapon"
+        }
+    ]
+}

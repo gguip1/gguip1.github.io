@@ -12,16 +12,21 @@ class ModelViewer {
         this.mixer = null;
         this.clock = new THREE.Clock();
         
+        // 모델 리스트는 JSON에서 로드됨
+        this.modelList = [];
+        this.currentModelIndex = 0;
+        this.isLoading = false;
+        this.modelsLoaded = false;
+        
         this.settings = {
             autoRotate: true,
             wireframe: false,
             rotationSpeed: 0.5,
             backgroundColor: 0x1a1a1a,
             modelBrightness: 1,
-            followSystemTheme: true // 시스템 테마 따라가기 설정
+            followSystemTheme: true
         };
         
-        // 테마 색상 정의
         this.themeColors = {
             dark: 0x1a1a1a,
             light: 0xf5f5f5
@@ -29,9 +34,115 @@ class ModelViewer {
         
         this.init();
         this.setupThemeDetection();
-        this.loadModel();
+        this.loadModelList(); // JSON 파일에서 모델 리스트 로드
         this.setupControls();
         this.animate();
+    }
+    
+    async loadModelList() {
+        try {
+            const response = await fetch('./models/models.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            this.modelList = data.models || [];
+            
+            if (this.modelList.length === 0) {
+                throw new Error('모델 리스트가 비어있습니다');
+            }
+            
+            this.modelsLoaded = true;
+            this.setupModelSelector();
+            this.loadModel();
+            
+            console.log(`${this.modelList.length}개의 모델을 로드했습니다`);
+        } catch (error) {
+            console.error('모델 리스트 로딩 실패:', error);
+            
+            // 기본 모델 리스트로 폴백
+            this.modelList = [
+            ];
+            
+            this.modelsLoaded = true;
+            this.setupModelSelector();
+            this.loadModel();
+            
+            // 사용자에게 알림
+            const loadingElement = document.getElementById('loading');
+            const loadingText = loadingElement.querySelector('p');
+            loadingText.innerHTML = 'JSON 파일 로딩 실패, 기본 모델을 사용합니다.<br>잠시 후 자동으로 로딩됩니다.';
+            
+            setTimeout(() => {
+                if (this.modelsLoaded) {
+                    loadingElement.style.display = 'none';
+                }
+            }, 2000);
+        }
+    }
+    
+    setupModelSelector() {
+        if (!this.modelsLoaded || this.modelList.length === 0) {
+            return;
+        }
+        
+        const modelSelect = document.getElementById('model-select');
+        
+        // 기존 옵션들 제거
+        modelSelect.innerHTML = '';
+        
+        // 모델 리스트로 옵션 생성
+        this.modelList.forEach((model, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = model.name;
+            if (model.description) {
+                option.title = model.description;
+            }
+            if (index === this.currentModelIndex) {
+                option.selected = true;
+            }
+            modelSelect.appendChild(option);
+        });
+        
+        // 모델 선택 이벤트
+        modelSelect.addEventListener('change', (e) => {
+            const newIndex = parseInt(e.target.value);
+            if (newIndex !== this.currentModelIndex && !this.isLoading) {
+                this.switchModel(newIndex);
+            }
+        });
+    }
+    
+    switchModel(newIndex) {
+        if (newIndex < 0 || newIndex >= this.modelList.length || this.isLoading || !this.modelsLoaded) {
+            return;
+        }
+        
+        this.currentModelIndex = newIndex;
+        this.isLoading = true;
+        
+        // 로딩 상태 표시
+        const loadingElement = document.getElementById('loading');
+        const loadingText = loadingElement.querySelector('p');
+        loadingElement.style.display = 'block';
+        loadingText.textContent = `${this.modelList[newIndex].name} 로딩중...`;
+        
+        // 기존 모델 제거
+        if (this.model) {
+            this.scene.remove(this.model);
+            this.disposeObject(this.model);
+            this.model = null;
+        }
+        
+        // 기존 애니메이션 정리
+        if (this.mixer) {
+            this.mixer.stopAllActions();
+            this.mixer = null;
+        }
+        
+        // 새 모델 로드
+        this.loadModel();
     }
     
     setupThemeDetection() {
@@ -144,10 +255,16 @@ class ModelViewer {
     }
     
     loadModel() {
+        if (!this.modelsLoaded || this.modelList.length === 0) {
+            console.warn('모델 리스트가 아직 로드되지 않았습니다');
+            return;
+        }
+        
         const loader = new GLTFLoader();
+        const currentModel = this.modelList[this.currentModelIndex];
         
         loader.load(
-            './assets/Blade_of_Lumina.glb',
+            currentModel.path,
             (gltf) => {
                 this.model = gltf.scene;
                 
@@ -159,27 +276,26 @@ class ModelViewer {
                         
                         // 매테리얼 처리 개선
                         if (child.material) {
-                            // 배열인 경우와 단일 매테리얼인 경우 모두 처리
                             const materials = Array.isArray(child.material) ? child.material : [child.material];
                             
                             materials.forEach(material => {
                                 if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
                                     material.envMapIntensity = 1;
+                                    material.wireframe = this.settings.wireframe;
                                     material.needsUpdate = true;
                                 } else if (material.isMeshBasicMaterial) {
-                                    // BasicMaterial을 StandardMaterial로 교체
                                     const newMaterial = new THREE.MeshStandardMaterial({
                                         map: material.map,
                                         color: material.color,
                                         transparent: material.transparent,
-                                        opacity: material.opacity
+                                        opacity: material.opacity,
+                                        wireframe: this.settings.wireframe
                                     });
                                     child.material = newMaterial;
                                 }
                             });
                         }
                         
-                        // Geometry 확인 및 수정
                         if (child.geometry) {
                             child.geometry.computeVertexNormals();
                             if (!child.geometry.attributes.normal) {
@@ -195,18 +311,17 @@ class ModelViewer {
                 const size = box.getSize(new THREE.Vector3());
                 
                 const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 3 / maxDim; // 스케일 증가
+                const scale = 3 / maxDim;
                 this.model.scale.multiplyScalar(scale);
                 
-                // 모델을 정중앙에 위치시키기
                 this.model.position.sub(center.multiplyScalar(scale));
-                this.model.position.y = 0; // Y축 중앙에 위치
+                this.model.position.y = 0;
                 
                 this.scene.add(this.model);
                 
-                // 카메라 위치 및 타겟 조정 - 모델 중앙을 바라보도록
+                // 카메라 위치 및 타겟 조정
                 this.camera.position.set(0, 0, 5);
-                this.controls.target.set(0, 0, 0); // 정중앙을 타겟으로
+                this.controls.target.set(0, 0, 0);
                 this.controls.update();
                 
                 // 애니메이션 설정 (있는 경우)
@@ -218,16 +333,24 @@ class ModelViewer {
                 }
                 
                 // 로딩 완료
+                this.isLoading = false;
                 document.getElementById('loading').style.display = 'none';
-                // console.log('Model loaded successfully');
+                console.log(`${currentModel.name} 로드 완료`);
             },
             (progress) => {
                 // console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
             },
             (error) => {
-                // console.error('Error loading model:', error);
-                document.getElementById('loading').innerHTML = 
-                    '<p>모델 로딩에 실패했습니다.<br>파일 경로를 확인해주세요.</p>';
+                console.error(`${currentModel.name} 로딩 실패:`, error);
+                this.isLoading = false;
+                const loadingElement = document.getElementById('loading');
+                const loadingText = loadingElement.querySelector('p');
+                loadingText.innerHTML = `${currentModel.name} 로딩에 실패했습니다.<br>파일 경로를 확인해주세요.`;
+                
+                // 3초 후 로딩 메시지 숨기기
+                setTimeout(() => {
+                    loadingElement.style.display = 'none';
+                }, 3000);
             }
         );
     }
