@@ -111,10 +111,15 @@ class SeasonManager {
         // 브라우저 UI 상태 감지
         const hasBottomBar = this.detectBottomBar(currentViewportHeight);
         
-        // 기존 클래스 제거
+        // 모든 기존 클래스와 스타일 초기화
         [seasonIndicator, connectionIndicator].forEach(indicator => {
             indicator.classList.remove('has-bottom-bar', 'no-bottom-bar', 'landscape-mode');
+            // 인라인 스타일 초기화
+            indicator.style.bottom = '';
         });
+        
+        // CSS 커스텀 프로퍼티 초기화
+        document.documentElement.style.removeProperty('--dynamic-bottom');
         
         if (isMobile) {
             let bottomValue;
@@ -141,6 +146,10 @@ class SeasonManager {
             
             // CSS 커스텀 프로퍼티로 동적 값 설정
             document.documentElement.style.setProperty('--dynamic-bottom', bottomValue);
+        } else {
+            // 데스크탑 모드에서는 기본 CSS 값 사용
+            // CSS 파일의 기본 bottom 값이 적용되도록 함
+            // console.log('Desktop mode: using default CSS positioning');
         }
 
         // 이전 높이 업데이트
@@ -425,7 +434,7 @@ class SeasonManager {
 
             this.websocket.onopen = () => {
                 this.isConnected = true;
-                console.log('WebSocket 연결됨');
+                // console.log('WebSocket 연결됨');
                 this.updateConnectionStatus(true, this.connectionCount);
             };
 
@@ -445,24 +454,24 @@ class SeasonManager {
 
             this.websocket.onclose = () => {
                 this.isConnected = false;
-                console.log('WebSocket 연결 종료');
+                // console.log('WebSocket 연결 종료');
                 this.updateConnectionStatus(false, 0);
                 
                 // 재연결 시도 (5초 후)
                 setTimeout(() => {
                     if (!this.isConnected) {
-                        console.log('WebSocket 재연결 시도...');
+                        // console.log('WebSocket 재연결 시도...');
                         this.connectWebSocket();
                     }
                 }, 5000);
             };
 
             this.websocket.onerror = (error) => {
-                console.log('WebSocket 오류:', error);
+                // console.log('WebSocket 오류:', error);
                 this.updateConnectionStatus(false, 0);
             };
         } catch (error) {
-            console.log('WebSocket 연결 실패:', error);
+            // console.log('WebSocket 연결 실패:', error);
             this.updateConnectionStatus(false, 0);
         }
     }

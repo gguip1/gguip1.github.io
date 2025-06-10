@@ -188,7 +188,7 @@ body {
     animation: springBreeze 20s ease-in-out infinite;
 }
 
-/* .container.spring::before {
+.container.spring::before {
     content: '';
     position: absolute;
     top: 0;
@@ -200,7 +200,7 @@ body {
         radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
         radial-gradient(circle at 40% 80%, rgba(144, 238, 144, 0.3) 0%, transparent 50%);
     animation: floatingPetals 15s ease-in-out infinite;
-} */
+}
 
 .spring .season-title {
     color: #2d5016;
@@ -567,7 +567,7 @@ body {
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     :root {
-        --dynamic-bottom: 20px;
+        --dynamic-bottom: 30px;
     }
     
     /* 모바일에서 자연스러운 스크롤 허용 */
@@ -668,7 +668,7 @@ body {
 
 @media (max-width: 480px) {
     :root {
-        --dynamic-bottom: 15px;
+        --dynamic-bottom: 30px;
     }
     
     html {
@@ -762,7 +762,7 @@ body {
 /* iOS Safari 최적화 */
 @supports (-webkit-touch-callout: none) {
     :root {
-        --dynamic-bottom: 35px;
+        --dynamic-bottom: 30px;
     }
     
     body {
@@ -775,25 +775,8 @@ body {
         -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
     }
     
-    .connection-status-indicator,
+    /* .connection-status-indicator,
     .current-season-indicator {
         bottom: max(var(--dynamic-bottom), calc(20px + env(safe-area-inset-bottom, 15px)));
-    }
-}
-
-/* 동적 조정을 위한 클래스들 */
-.connection-status-indicator.has-bottom-bar,
-.current-season-indicator.has-bottom-bar {
-    --dynamic-bottom: 80px;
-    transform: translateY(0);
-}
-
-.connection-status-indicator.no-bottom-bar,
-.current-season-indicator.no-bottom-bar {
-    transform: translateY(0);
-}
-
-.connection-status-indicator.landscape-mode,
-.current-season-indicator.landscape-mode {
-    --dynamic-bottom: 60px;
+    } */
 }
