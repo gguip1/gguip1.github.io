@@ -51,7 +51,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const size = parseInt(core.getInput("changes"));
+            const size = parseInt(process.env.CHANGES || "0");
             let label = "size/XS";
             if (size > 500) label = "size/XL";
             else if (size > 200) label = "size/L";
@@ -65,13 +65,13 @@ jobs:
               labels: [label]
             });
         env:
-          changes: ${{ steps.pr.outputs.changes }}
+          CHANGES: ${{ steps.pr.outputs.changes }}
 
       - name: Add type labels from commits
         uses: actions/github-script@v7
         with:
           script: |
-            const commitMessages = JSON.parse(core.getInput("messages"));
+            const commitMessages = JSON.parse(process.env.COMMIT_MESSAGES || "[]");
             const labels = new Set();
 
             for (const msg of commitMessages) {
@@ -91,7 +91,7 @@ jobs:
               });
             }
         env:
-          messages: ${{ steps.pr.outputs.commitMessages }}
+          COMMIT_MESSAGES: ${{ steps.pr.outputs.commitMessages }}
 
       - name: Post Commit Message Guide
         if: github.event.action == 'opened'
