@@ -103,15 +103,15 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `
-👋 PR 감사합니다!
+                👋 PR 감사합니다!
 
-💬 **커밋 메시지 작성 가이드 (Conventional Commits)**:
-- \`feat: 새로운 기능 추가\`
-- \`fix: 버그 수정\`
-- \`docs: 문서 변경\`
-- \`refactor: 코드 리팩토링\`
-- \`chore: 기타 변경사항\`
+                💬 **커밋 메시지 작성 가이드 (Conventional Commits)**:
+                - \`feat: 새로운 기능 추가\`
+                - \`fix: 버그 수정\`
+                - \`docs: 문서 변경\`
+                - \`refactor: 코드 리팩토링\`
+                - \`chore: 기타 변경사항\`
 
-🔖 사이즈 라벨은 변경된 줄 수 기준으로 자동 부착됩니다.
-            `
-            });
+                🔖 사이즈 라벨은 변경된 줄 수 기준으로 자동 부착됩니다.
+              `
+              });
