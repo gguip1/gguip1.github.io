@@ -46,6 +46,9 @@ class SeasonManager {
         this.websocket = null;
         this.isConnected = false;
 
+        // 뷰포트 높이 추적을 위한 변수 추가
+        this.isInitialized = false;
+
         this.init();
     }
 
@@ -54,7 +57,10 @@ class SeasonManager {
         this.setupEventListeners();
         this.setupResizeHandler();
         this.createAnimationContainer();
-        this.setupIndicatorPositioning();
+        
+        // 초기화 완료 후 인디케이터 위치 설정
+        this.adjustIndicatorPosition();
+        this.isInitialized = true;
 
         // 초기 상태는 연결 끊김
         this.updateConnectionStatus(false, 0);
@@ -64,20 +70,44 @@ class SeasonManager {
     }
 
     setupMobileOptimization() {
-        // 모바일에서 주소창 숨김을 위한 높이 조정
+        // 개선된 뷰포트 높이 설정
         const setVH = () => {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
+            
+            // 초기화 완료 후에만 인디케이터 위치 조정
+            if (this.isInitialized) {
+                this.adjustIndicatorPosition();
+            }
         };
 
+        // 초기 설정
         setVH();
-        window.addEventListener('resize', setVH);
+
+        // 이벤트 리스너 설정 (디바운스 적용)
+        let resizeTimeout;
+        const debouncedResize = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                setVH();
+            }, 100);
+        };
+
+        window.addEventListener('resize', debouncedResize);
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
                 setVH();
-                this.adjustIndicatorPosition();
-            }, 100);
+            }, 200);
         });
+
+        // Visual Viewport API 지원 브라우저
+        if ('visualViewport' in window) {
+            window.visualViewport.addEventListener('resize', () => {
+                setTimeout(() => {
+                    this.adjustIndicatorPosition();
+                }, 50);
+            });
+        }
     }
 
     setupIndicatorPositioning() {
@@ -100,114 +130,125 @@ class SeasonManager {
 
     adjustIndicatorPosition() {
         const currentViewportHeight = window.innerHeight;
+        const screenHeight = window.screen.height;
         const isLandscape = window.innerWidth > window.innerHeight;
         const isMobile = window.innerWidth <= 768;
         
-        // 브라우저 UI 변화 감지 개선
-        const uiState = this.detectMobileUIState();
-        
-        if (isMobile) {
-            this.updateMobileIndicatorPosition(uiState, isLandscape);
+        if (!isMobile) {
+            // 데스크톱에서는 기본값 사용
+            document.documentElement.style.setProperty('--browser-ui-height', '0px');
+            return;
         }
+
+        // 모바일 브라우저 UI 감지 개선
+        const uiState = this.detectMobileUIState(currentViewportHeight, screenHeight);
+        this.updateMobileIndicatorPosition(uiState, isLandscape);
 
         // 이전 높이 업데이트
         this.lastViewportHeight = currentViewportHeight;
     }
 
-    detectMobileUIState() {
-        const viewportHeight = window.innerHeight;
-        const screenHeight = window.screen.height;
-        const documentHeight = document.documentElement.clientHeight;
-        
-        // Visual Viewport API 사용 가능한 경우
+    detectMobileUIState(viewportHeight, screenHeight) {
+        // Visual Viewport API가 가장 정확함
         if ('visualViewport' in window) {
             const visualHeight = window.visualViewport.height;
             const heightDiff = viewportHeight - visualHeight;
             
             return {
-                hasBottomBar: heightDiff > 50,
-                uiHeight: heightDiff,
-                type: 'visual'
+                hasBottomBar: heightDiff > 20,
+                uiHeight: Math.max(0, heightDiff),
+                type: 'visual',
+                confidence: 'high'
             };
         }
         
-        // 기존 감지 방식 개선
-        const heightRatio = viewportHeight / screenHeight;
-        const heightDifference = screenHeight - viewportHeight;
-        
-        // iOS 감지
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (isIOS) {
-            return {
-                hasBottomBar: heightDifference > 100 || heightRatio < 0.85,
-                uiHeight: heightDifference,
-                type: 'ios'
-            };
-        }
-        
-        // Android 감지
+        // 플랫폼별 감지
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isAndroid = /Android/.test(navigator.userAgent);
-        if (isAndroid) {
+        const heightDifference = screenHeight - viewportHeight;
+        const heightRatio = viewportHeight / screenHeight;
+        
+        if (isIOS) {
+            // iOS Safari의 경우
             return {
-                hasBottomBar: heightDifference > 150 || heightRatio < 0.8,
-                uiHeight: heightDifference,
-                type: 'android'
+                hasBottomBar: heightRatio < 0.9 || heightDifference > 100,
+                uiHeight: Math.max(0, heightDifference * 0.3),
+                type: 'ios',
+                confidence: 'medium'
             };
         }
         
+        if (isAndroid) {
+            // Android Chrome의 경우
+            return {
+                hasBottomBar: heightRatio < 0.85 || heightDifference > 120,
+                uiHeight: Math.max(0, heightDifference * 0.25),
+                type: 'android',
+                confidence: 'medium'
+            };
+        }
+        
+        // 일반적인 경우
         return {
-            hasBottomBar: heightDifference > 100,
-            uiHeight: heightDifference,
-            type: 'generic'
+            hasBottomBar: heightDifference > 80,
+            uiHeight: Math.max(0, heightDifference * 0.2),
+            type: 'generic',
+            confidence: 'low'
         };
     }
 
     updateMobileIndicatorPosition(uiState, isLandscape) {
-        const { hasBottomBar, uiHeight, type } = uiState;
-        let dynamicBottom;
-        let safeAreaBottom = 0;
+        const { hasBottomBar, uiHeight, type, confidence } = uiState;
+        let browserUIHeight = 0;
         
-        // Safe area 값 계산
-        if (CSS.supports('padding-bottom', 'env(safe-area-inset-bottom)')) {
-            // CSS가 처리할 수 있도록 0으로 설정
-            safeAreaBottom = 0;
-        }
-        
-        if (isLandscape) {
-            // 가로 모드: 더 넉넉한 여백
-            dynamicBottom = 25;
-        } else if (hasBottomBar) {
-            // 세로 모드 + 브라우저 UI 있음
-            switch (type) {
-                case 'ios':
-                    dynamicBottom = Math.max(40, Math.min(uiHeight * 0.3, 80));
-                    break;
-                case 'android':
-                    dynamicBottom = Math.max(45, Math.min(uiHeight * 0.25, 75));
-                    break;
-                case 'visual':
-                    dynamicBottom = Math.max(35, Math.min(uiHeight + 20, 70));
-                    break;
-                default:
-                    dynamicBottom = Math.max(40, Math.min(uiHeight * 0.3, 80));
+        // 브라우저 UI 높이 계산
+        if (hasBottomBar && uiHeight > 0) {
+            if (isLandscape) {
+                // 가로 모드에서는 UI 높이를 줄임
+                browserUIHeight = Math.min(uiHeight * 0.5, 30);
+            } else {
+                // 세로 모드에서 타입별 조정
+                switch (type) {
+                    case 'visual':
+                        browserUIHeight = Math.min(uiHeight + 10, 60);
+                        break;
+                    case 'ios':
+                        browserUIHeight = Math.min(uiHeight, 50);
+                        break;
+                    case 'android':
+                        browserUIHeight = Math.min(uiHeight, 45);
+                        break;
+                    default:
+                        browserUIHeight = Math.min(uiHeight, 40);
+                }
             }
-        } else {
-            // 세로 모드 + 브라우저 UI 없음
-            dynamicBottom = window.innerWidth <= 480 ? 15 : 20;
         }
         
-        // CSS 커스텀 프로퍼티로 값 설정
-        document.documentElement.style.setProperty('--dynamic-bottom', `${dynamicBottom}px`);
-        document.documentElement.style.setProperty('--safe-area-bottom', `${safeAreaBottom}px`);
+        // CSS 변수 업데이트
+        document.documentElement.style.setProperty('--browser-ui-height', `${browserUIHeight}px`);
         
-        // 디버그 정보 (개발 중에만 사용)
-        // console.log(`UI State: ${type}, hasBottomBar: ${hasBottomBar}, dynamicBottom: ${dynamicBottom}px`);
+        // 강제 리렌더링 (필요한 경우만)
+        if (confidence === 'high') {
+            this.forceIndicatorUpdate();
+        }
     }
 
-    detectBottomBar(viewportHeight) {
-        // 기존 메서드는 호환성을 위해 유지하되 새로운 로직으로 리다이렉트
-        const uiState = this.detectMobileUIState();
-        return uiState.hasBottomBar;
+    forceIndicatorUpdate() {
+        // 더 부드러운 강제 업데이트
+        const indicators = [
+            document.getElementById('connectionStatusIndicator'),
+            document.getElementById('currentSeasonIndicator')
+        ];
+        
+        indicators.forEach(indicator => {
+            if (indicator) {
+                // transform을 이용한 GPU 가속 업데이트
+                indicator.style.transform = 'translateZ(0) translateY(0.1px)';
+                requestAnimationFrame(() => {
+                    indicator.style.transform = 'translateZ(0)';
+                });
+            }
+        });
     }
 
     updateConnectionStatus(isConnected, userCount = 0) {
@@ -290,10 +331,15 @@ class SeasonManager {
         // 컨텐츠 업데이트
         this.updateContent(season);
 
+        // 계절 변경 후 약간의 지연을 두고 인디케이터 위치 재조정
+        setTimeout(() => {
+            this.adjustIndicatorPosition();
+        }, 300); // 계절 애니메이션이 시작된 후
+
         // 계절별 애니메이션 시작
         this.startSeasonAnimation(season);
 
-        // 웹소켓으로 상태 전송 (추후 확장용)
+        // 웹소켓으로 상태 전송
         if (!skipSend) {
             this.sendSeasonUpdate(season);
         }
