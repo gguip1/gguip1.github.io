@@ -99,78 +99,115 @@ class SeasonManager {
     }
 
     adjustIndicatorPosition() {
-        const seasonIndicator = document.getElementById('currentSeasonIndicator');
-        const connectionIndicator = document.getElementById('connectionStatusIndicator');
-        
-        if (!seasonIndicator || !connectionIndicator) return;
-
         const currentViewportHeight = window.innerHeight;
         const isLandscape = window.innerWidth > window.innerHeight;
         const isMobile = window.innerWidth <= 768;
         
-        // 브라우저 UI 상태 감지
-        const hasBottomBar = this.detectBottomBar(currentViewportHeight);
-        
-        // 모든 기존 클래스와 스타일 초기화
-        [seasonIndicator, connectionIndicator].forEach(indicator => {
-            indicator.classList.remove('has-bottom-bar', 'no-bottom-bar', 'landscape-mode');
-            // 인라인 스타일 초기화
-            indicator.style.bottom = '';
-        });
-        
-        // CSS 커스텀 프로퍼티 초기화
-        document.documentElement.style.removeProperty('--dynamic-bottom');
+        // 브라우저 UI 변화 감지 개선
+        const uiState = this.detectMobileUIState();
         
         if (isMobile) {
-            let bottomValue;
-            
-            if (isLandscape) {
-                // 가로 모드
-                [seasonIndicator, connectionIndicator].forEach(indicator => {
-                    indicator.classList.add('landscape-mode');
-                });
-                bottomValue = '60px';
-            } else if (hasBottomBar) {
-                // 세로 모드 + 브라우저 바 있음
-                [seasonIndicator, connectionIndicator].forEach(indicator => {
-                    indicator.classList.add('has-bottom-bar');
-                });
-                bottomValue = Math.max(80, currentViewportHeight * 0.12) + 'px';
-            } else {
-                // 세로 모드 + 브라우저 바 없음
-                [seasonIndicator, connectionIndicator].forEach(indicator => {
-                    indicator.classList.add('no-bottom-bar');
-                });
-                bottomValue = window.innerWidth <= 480 ? '15px' : '20px';
-            }
-            
-            // CSS 커스텀 프로퍼티로 동적 값 설정
-            document.documentElement.style.setProperty('--dynamic-bottom', bottomValue);
-        } else {
-            // 데스크탑 모드에서는 기본 CSS 값 사용
-            // CSS 파일의 기본 bottom 값이 적용되도록 함
-            // console.log('Desktop mode: using default CSS positioning');
+            this.updateMobileIndicatorPosition(uiState, isLandscape);
         }
 
         // 이전 높이 업데이트
         this.lastViewportHeight = currentViewportHeight;
     }
 
-    detectBottomBar(viewportHeight) {
-        // 다양한 방법으로 브라우저 하단 바 감지
+    detectMobileUIState() {
+        const viewportHeight = window.innerHeight;
         const screenHeight = window.screen.height;
+        const documentHeight = document.documentElement.clientHeight;
+        
+        // Visual Viewport API 사용 가능한 경우
+        if ('visualViewport' in window) {
+            const visualHeight = window.visualViewport.height;
+            const heightDiff = viewportHeight - visualHeight;
+            
+            return {
+                hasBottomBar: heightDiff > 50,
+                uiHeight: heightDiff,
+                type: 'visual'
+            };
+        }
+        
+        // 기존 감지 방식 개선
         const heightRatio = viewportHeight / screenHeight;
         const heightDifference = screenHeight - viewportHeight;
         
-        // Android Chrome 등에서 하단 바가 있을 때의 특징
-        const hasSignificantHeightDifference = heightDifference > 100;
-        const hasLowHeightRatio = heightRatio < 0.85;
+        // iOS 감지
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            return {
+                hasBottomBar: heightDifference > 100 || heightRatio < 0.85,
+                uiHeight: heightDifference,
+                type: 'ios'
+            };
+        }
         
-        // iOS Safari에서의 감지
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const hasIOSBar = isIOS && heightDifference > 50;
+        // Android 감지
+        const isAndroid = /Android/.test(navigator.userAgent);
+        if (isAndroid) {
+            return {
+                hasBottomBar: heightDifference > 150 || heightRatio < 0.8,
+                uiHeight: heightDifference,
+                type: 'android'
+            };
+        }
         
-        return hasSignificantHeightDifference || hasLowHeightRatio || hasIOSBar;
+        return {
+            hasBottomBar: heightDifference > 100,
+            uiHeight: heightDifference,
+            type: 'generic'
+        };
+    }
+
+    updateMobileIndicatorPosition(uiState, isLandscape) {
+        const { hasBottomBar, uiHeight, type } = uiState;
+        let dynamicBottom;
+        let safeAreaBottom = 0;
+        
+        // Safe area 값 계산
+        if (CSS.supports('padding-bottom', 'env(safe-area-inset-bottom)')) {
+            // CSS가 처리할 수 있도록 0으로 설정
+            safeAreaBottom = 0;
+        }
+        
+        if (isLandscape) {
+            // 가로 모드: 더 넉넉한 여백
+            dynamicBottom = 25;
+        } else if (hasBottomBar) {
+            // 세로 모드 + 브라우저 UI 있음
+            switch (type) {
+                case 'ios':
+                    dynamicBottom = Math.max(40, Math.min(uiHeight * 0.3, 80));
+                    break;
+                case 'android':
+                    dynamicBottom = Math.max(45, Math.min(uiHeight * 0.25, 75));
+                    break;
+                case 'visual':
+                    dynamicBottom = Math.max(35, Math.min(uiHeight + 20, 70));
+                    break;
+                default:
+                    dynamicBottom = Math.max(40, Math.min(uiHeight * 0.3, 80));
+            }
+        } else {
+            // 세로 모드 + 브라우저 UI 없음
+            dynamicBottom = window.innerWidth <= 480 ? 15 : 20;
+        }
+        
+        // CSS 커스텀 프로퍼티로 값 설정
+        document.documentElement.style.setProperty('--dynamic-bottom', `${dynamicBottom}px`);
+        document.documentElement.style.setProperty('--safe-area-bottom', `${safeAreaBottom}px`);
+        
+        // 디버그 정보 (개발 중에만 사용)
+        // console.log(`UI State: ${type}, hasBottomBar: ${hasBottomBar}, dynamicBottom: ${dynamicBottom}px`);
+    }
+
+    detectBottomBar(viewportHeight) {
+        // 기존 메서드는 호환성을 위해 유지하되 새로운 로직으로 리다이렉트
+        const uiState = this.detectMobileUIState();
+        return uiState.hasBottomBar;
     }
 
     updateConnectionStatus(isConnected, userCount = 0) {
