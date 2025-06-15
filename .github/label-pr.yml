@@ -1,0 +1,117 @@
+name: Label Pull Requests
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  analyze-and-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Get PR info
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const commits = await github.paginate(
+              github.rest.pulls.listCommits,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+              }
+            );
+
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+              }
+            );
+
+            const totalChanges = files.reduce((sum, f) => sum + f.changes, 0);
+            const commitMessages = commits.map(c => c.commit.message);
+
+            core.setOutput("commitMessages", JSON.stringify(commitMessages));
+            core.setOutput("changes", totalChanges);
+            core.setOutput("numCommits", commits.length);
+
+      - name: Add size label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const size = parseInt(core.getInput("changes"));
+            let label = "size/XS";
+            if (size > 500) label = "size/XL";
+            else if (size > 200) label = "size/L";
+            else if (size > 100) label = "size/M";
+            else if (size > 20) label = "size/S";
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [label]
+            });
+        env:
+          changes: ${{ steps.pr.outputs.changes }}
+
+      - name: Add type labels from commits
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commitMessages = JSON.parse(core.getInput("messages"));
+            const labels = new Set();
+
+            for (const msg of commitMessages) {
+              if (/^feat/i.test(msg)) labels.add("type/feature");
+              if (/^fix/i.test(msg)) labels.add("type/bug");
+              if (/^docs/i.test(msg)) labels.add("type/docs");
+              if (/^refactor/i.test(msg)) labels.add("type/refactor");
+              if (/^chore/i.test(msg)) labels.add("type/chore");
+            }
+
+            if (labels.size > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: Array.from(labels)
+              });
+            }
+        env:
+          messages: ${{ steps.pr.outputs.commitMessages }}
+
+      - name: Post Commit Message Guide
+        if: github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `
+👋 PR 감사합니다!
+
+💬 **커밋 메시지 작성 가이드 (Conventional Commits)**:
+- \`feat: 새로운 기능 추가\`
+- \`fix: 버그 수정\`
+- \`docs: 문서 변경\`
+- \`refactor: 코드 리팩토링\`
+- \`chore: 기타 변경사항\`
+
+🔖 사이즈 라벨은 변경된 줄 수 기준으로 자동 부착됩니다.
+            `
+            });
