@@ -81,6 +81,19 @@ body {
     transform: translateY(-5px);
 }
 
+/* 비활성화된 버튼 스타일 */
+.season-btn.disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.season-btn.disabled:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: none;
+    box-shadow: none;
+}
+
 .season-icon {
     font-size: 2.5rem;
     margin-bottom: 8px;
@@ -212,13 +225,16 @@ body {
 /* 펄스 애니메이션 */
 @keyframes pulse {
     0% {
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
     }
     50% {
-        box-shadow: 0 0 16px rgba(76, 175, 80, 0.8);
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
     }
     100% {
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
     }
 }
 

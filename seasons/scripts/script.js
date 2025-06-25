@@ -64,6 +64,7 @@ class SeasonManager {
 
         // 초기 상태는 연결 끊김
         this.updateConnectionStatus(false, 0);
+        this.updateButtonsState(false); // 버튼들을 비활성화 상태로 시작
 
         // 웹소켓 연결 시도
         this.connectWebSocket();
@@ -259,9 +260,11 @@ class SeasonManager {
         if (isConnected) {
             this.connectionDot.className = 'connection-dot connected';
             this.connectionText.textContent = `사용자 수: ${userCount}`;
+            this.updateButtonsState(true); // 버튼들을 활성화
         } else {
             this.connectionDot.className = 'connection-dot disconnected';
             this.connectionText.textContent = '연결 끊김';
+            this.updateButtonsState(false); // 버튼들을 비활성화
         }
     }
 
@@ -269,6 +272,12 @@ class SeasonManager {
         const seasonButtons = document.querySelectorAll('.season-btn');
         seasonButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
+                // 웹소켓이 연결되지 않았으면 계절 변경 차단
+                if (!this.isConnected) {
+                    this.showConnectionMessage();
+                    return;
+                }
+                
                 const season = e.currentTarget.dataset.season;
                 this.changeSeason(season);
             });
@@ -313,6 +322,12 @@ class SeasonManager {
     }
 
     changeSeason(season, skipSend = false) {
+        // 웹소켓이 연결되지 않았고, 서버에서 온 요청이 아니라면 차단
+        if (!this.isConnected && !skipSend) {
+            this.showConnectionMessage();
+            return;
+        }
+
         if (this.currentSeason === season) return;
 
         // 기존 계절 클래스 제거
@@ -380,6 +395,69 @@ class SeasonManager {
             winter: '겨울'
         };
         return korean[season] || '없음';
+    }
+
+    // 버튼들의 활성화/비활성화 상태 관리
+    updateButtonsState(isEnabled) {
+        const seasonButtons = document.querySelectorAll('.season-btn');
+        seasonButtons.forEach(btn => {
+            if (isEnabled) {
+                btn.classList.remove('disabled');
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.classList.add('disabled');
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            }
+        });
+    }
+
+    // 연결되지 않았을 때 표시할 메시지
+    showConnectionMessage() {
+        // 잠깐 연결 상태를 강조 표시
+        const indicator = document.getElementById('connectionStatusIndicator');
+        if (indicator) {
+            indicator.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                indicator.style.animation = '';
+            }, 500);
+        }
+    }
+
+    // 웹소켓 연결 성공 시 초기 컨텐츠 설정
+    setInitialContent() {
+        // 저장된 계절이 있다면 복원, 없다면 기본 메시지 표시
+        const savedSeason = localStorage.getItem('currentSeason');
+        if (savedSeason && this.seasonData[savedSeason]) {
+            // 서버에서 온 데이터로 복원하므로 skipSend = true
+            this.changeSeason(savedSeason, true);
+        } else {
+            // 기본 상태로 설정
+            this.seasonTitle.textContent = '계절을 선택해주세요';
+            this.seasonDescription.textContent = '위의 버튼을 클릭하여 원하는 계절을 선택하세요';
+        }
+    }
+
+    // 연결이 끊어졌을 때 원래 상태로 되돌림
+    resetToConnectionState() {
+        // 기존 계절 클래스 제거
+        if (this.currentSeason) {
+            this.container.classList.remove(this.currentSeason);
+            this.stopSeasonAnimation();
+            this.currentSeason = null;
+        }
+
+        // 버튼 상태 초기화
+        const seasonButtons = document.querySelectorAll('.season-btn');
+        seasonButtons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // 텍스트를 서버 연결 중으로 되돌림
+        this.seasonTitle.textContent = '서버 연결 중...';
+        this.seasonDescription.textContent = '느린 서버와 함께 하는 중...';
+        this.currentSeasonText.textContent = '없음';
     }
 
     startSeasonAnimation(season) {
@@ -519,6 +597,9 @@ class SeasonManager {
                 this.isConnected = true;
                 // console.log('WebSocket 연결됨');
                 this.updateConnectionStatus(true, this.connectionCount);
+                
+                // 연결 성공 시 초기 상태 설정
+                this.setInitialContent();
             };
 
             this.websocket.onmessage = (event) => {
@@ -540,6 +621,9 @@ class SeasonManager {
                 // console.log('WebSocket 연결 종료');
                 this.updateConnectionStatus(false, 0);
                 
+                // 연결이 끊어지면 "서버 연결 중..." 메시지로 되돌림
+                this.resetToConnectionState();
+                
                 // 재연결 시도 (5초 후)
                 setTimeout(() => {
                     if (!this.isConnected) {
@@ -552,10 +636,12 @@ class SeasonManager {
             this.websocket.onerror = (error) => {
                 // console.log('WebSocket 오류:', error);
                 this.updateConnectionStatus(false, 0);
+                this.resetToConnectionState();
             };
         } catch (error) {
             // console.log('WebSocket 연결 실패:', error);
             this.updateConnectionStatus(false, 0);
+            this.resetToConnectionState();
         }
     }
 
