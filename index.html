@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,15 +30,16 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-20C2B1J430"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-20C2B1J430');
+        gtag('config', 'G-20C2B1J430');
     </script>
 
     <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5481609101634854" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5481609101634854"
+        crossorigin="anonymous"></script>
 
     <link rel="icon" href="./assets/icons/root_icon/favicon.ico" type="image/x-icon">
     <style>
@@ -69,7 +71,7 @@
         h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .subtitle {
@@ -88,7 +90,7 @@
             background: white;
             border-radius: 15px;
             padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             text-decoration: none;
             color: inherit;
@@ -200,11 +202,11 @@
             .container {
                 padding: 1rem;
             }
-            
+
             h1 {
                 font-size: 2rem;
             }
-            
+
             .projects-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
@@ -217,6 +219,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -228,7 +231,7 @@
             <div class="projects-grid" id="projects-grid">
                 <!-- 프로젝트들이 여기에 동적으로 추가됩니다 -->
             </div>
-            
+
             <div class="no-projects" id="no-projects" style="display: none;">
                 <p>아직 프로젝트가 없습니다. 새로운 프로젝트를 만들어보세요!</p>
             </div>
@@ -241,24 +244,24 @@
                     <span>🧑‍💻</span>
                     <span>gguip1</span>
                 </div>
-                
+
                 <div class="footer-item">
                     <span>📂</span>
                     <a href="https://github.com/gguip1" target="_blank">GitHub: github.com/gguip1</a>
                 </div>
-                
+
                 <div class="footer-item">
                     <span>📋</span>
                     <span>MIT License</span>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
                 <p>&copy; 2025 gguip1 | 모든 프로젝트는 학습 목적으로 제작되었습니다.</p>
             </div>
         </footer>
     </div>
-    
+
     <script>
         // 프로젝트 목록 (새 프로젝트 추가 시 여기에 추가하세요)
         const projects = [
@@ -267,8 +270,15 @@
                 folder: "seasons",
                 description: "WebSocket을 이용해 접속한 모든 사용자가 동일한 계절 상태를 실시간으로 공유하는 웹 애플리케이션",
                 icon: "🍂",
-                status: "개발중"
-            }
+                status: "Live"
+            },
+            {
+                name: "인증",
+                folder: "auth",
+                description: "준비 중인 인증 시스템",
+                icon: "🔑",
+                status: "Live"
+            },
         ];
 
         // 프로젝트 카드 생성 함수
@@ -299,9 +309,10 @@
         }
 
         // 페이지 로드 시 실행
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             renderProjects();
         });
     </script>
 </body>
+
 </html>
