@@ -57,7 +57,7 @@ class SeasonManager {
         this.setupEventListeners();
         this.setupResizeHandler();
         this.createAnimationContainer();
-        
+
         // 초기화 완료 후 인디케이터 위치 설정
         this.adjustIndicatorPosition();
         this.isInitialized = true;
@@ -75,7 +75,7 @@ class SeasonManager {
         const setVH = () => {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
-            
+
             // 초기화 완료 후에만 인디케이터 위치 조정
             if (this.isInitialized) {
                 this.adjustIndicatorPosition();
@@ -134,7 +134,7 @@ class SeasonManager {
         const screenHeight = window.screen.height;
         const isLandscape = window.innerWidth > window.innerHeight;
         const isMobile = window.innerWidth <= 768;
-        
+
         if (!isMobile) {
             // 데스크톱에서는 기본값 사용
             document.documentElement.style.setProperty('--browser-ui-height', '0px');
@@ -154,7 +154,7 @@ class SeasonManager {
         if ('visualViewport' in window) {
             const visualHeight = window.visualViewport.height;
             const heightDiff = viewportHeight - visualHeight;
-            
+
             return {
                 hasBottomBar: heightDiff > 20,
                 uiHeight: Math.max(0, heightDiff),
@@ -162,13 +162,13 @@ class SeasonManager {
                 confidence: 'high'
             };
         }
-        
+
         // 플랫폼별 감지
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isAndroid = /Android/.test(navigator.userAgent);
         const heightDifference = screenHeight - viewportHeight;
         const heightRatio = viewportHeight / screenHeight;
-        
+
         if (isIOS) {
             // iOS Safari의 경우
             return {
@@ -178,7 +178,7 @@ class SeasonManager {
                 confidence: 'medium'
             };
         }
-        
+
         if (isAndroid) {
             // Android Chrome의 경우
             return {
@@ -188,7 +188,7 @@ class SeasonManager {
                 confidence: 'medium'
             };
         }
-        
+
         // 일반적인 경우
         return {
             hasBottomBar: heightDifference > 80,
@@ -201,7 +201,7 @@ class SeasonManager {
     updateMobileIndicatorPosition(uiState, isLandscape) {
         const { hasBottomBar, uiHeight, type, confidence } = uiState;
         let browserUIHeight = 0;
-        
+
         // 브라우저 UI 높이 계산
         if (hasBottomBar && uiHeight > 0) {
             if (isLandscape) {
@@ -224,10 +224,10 @@ class SeasonManager {
                 }
             }
         }
-        
+
         // CSS 변수 업데이트
         document.documentElement.style.setProperty('--browser-ui-height', `${browserUIHeight}px`);
-        
+
         // 강제 리렌더링 (필요한 경우만)
         if (confidence === 'high') {
             this.forceIndicatorUpdate();
@@ -240,7 +240,7 @@ class SeasonManager {
             document.getElementById('connectionStatusIndicator'),
             document.getElementById('currentSeasonIndicator')
         ];
-        
+
         indicators.forEach(indicator => {
             if (indicator) {
                 // transform을 이용한 GPU 가속 업데이트
@@ -256,13 +256,15 @@ class SeasonManager {
         if (!this.connectionDot || !this.connectionText) return;
 
         this.connectionCount = userCount;
-        
+
         if (isConnected) {
-            this.connectionDot.className = 'connection-dot connected';
+            this.connectionDot.className = 'w-2 h-2 rounded-full transition-colors duration-300 connected bg-green-500 animate-pulse';
+            this.connectionDot.style.boxShadow = '0 0 8px rgba(76, 175, 80, 0.6)';
             this.connectionText.textContent = `사용자 수: ${userCount}`;
             this.updateButtonsState(true); // 버튼들을 활성화
         } else {
-            this.connectionDot.className = 'connection-dot disconnected';
+            this.connectionDot.className = 'w-2 h-2 rounded-full transition-colors duration-300 disconnected bg-red-500';
+            this.connectionDot.style.boxShadow = '0 0 8px rgba(244, 67, 54, 0.6)';
             this.connectionText.textContent = '연결 끊김';
             this.updateButtonsState(false); // 버튼들을 비활성화
         }
@@ -277,7 +279,7 @@ class SeasonManager {
                     this.showConnectionMessage();
                     return;
                 }
-                
+
                 const season = e.currentTarget.dataset.season;
                 this.changeSeason(season);
             });
@@ -308,16 +310,7 @@ class SeasonManager {
 
     createAnimationContainer() {
         this.animationContainer = document.createElement('div');
-        this.animationContainer.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 2;
-            overflow: hidden;
-        `;
+        this.animationContainer.className = 'absolute inset-0 pointer-events-none overflow-hidden z-[5]';
         this.container.appendChild(this.animationContainer);
     }
 
@@ -336,9 +329,33 @@ class SeasonManager {
             this.stopSeasonAnimation();
         }
 
-        // 새 계절 적용
+        // 새 계절 적용 - Tailwind 클래스로 배경 변경
         this.currentSeason = season;
         this.container.classList.add(season);
+
+        // 배경 그라디언트 및 애니메이션 적용
+        switch (season) {
+            case 'spring':
+                this.container.style.background = 'linear-gradient(135deg, #ffb3ba 0%, #ffdfba 25%, #ffffba 50%, #baffc9 75%, #bae1ff 100%)';
+                this.container.style.backgroundSize = '400% 400%';
+                this.container.style.animation = 'springBreeze 20s ease-in-out infinite';
+                break;
+            case 'summer':
+                this.container.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ffa726 25%, #ffeb3b 50%, #66bb6a 75%, #42a5f5 100%)';
+                this.container.style.backgroundSize = '400% 400%';
+                this.container.style.animation = 'summerHeat 25s ease-in-out infinite';
+                break;
+            case 'autumn':
+                this.container.style.background = 'linear-gradient(135deg, #d32f2f 0%, #f57c00 25%, #fbc02d 50%, #689f38 75%, #1976d2 100%)';
+                this.container.style.backgroundSize = '400% 400%';
+                this.container.style.animation = 'autumnWind 18s ease-in-out infinite';
+                break;
+            case 'winter':
+                this.container.style.background = 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 25%, #90caf9 50%, #64b5f6 75%, #42a5f5 100%)';
+                this.container.style.backgroundSize = '400% 400%';
+                this.container.style.animation = 'winterChill 30s ease-in-out infinite';
+                break;
+        }
 
         // 버튼 상태 업데이트
         this.updateButtonStates(season);
@@ -363,9 +380,9 @@ class SeasonManager {
     updateButtonStates(activeSeason) {
         const seasonButtons = document.querySelectorAll('.season-btn');
         seasonButtons.forEach(btn => {
-            btn.classList.remove('active');
+            btn.classList.remove('bg-white/40', 'border-white/60', '-translate-y-[5px]');
             if (btn.dataset.season === activeSeason) {
-                btn.classList.add('active');
+                btn.classList.add('bg-white/40', 'border-white/60', '-translate-y-[5px]');
             }
         });
     }
@@ -382,9 +399,38 @@ class SeasonManager {
             this.seasonDescription.textContent = data.description;
             this.currentSeasonText.textContent = this.getSeasonKorean(season);
 
+            // 계절별 텍스트 색상 적용
+            this.updateTextColors(season);
+
             this.seasonTitle.style.opacity = '1';
             this.seasonDescription.style.opacity = '1';
         }, 300);
+    }
+
+    updateTextColors(season) {
+        // 기존 색상 클래스 제거
+        this.seasonTitle.className = 'text-6xl font-bold mb-6 transition-all duration-300 ease-in-out max-md:text-[2.5rem] max-[480px]:text-4xl';
+        this.seasonDescription.className = 'text-2xl max-w-[600px] leading-relaxed transition-all duration-300 ease-in-out max-md:text-xl max-md:px-4 max-[480px]:text-lg';
+
+        // 계절별 색상 적용
+        switch (season) {
+            case 'spring':
+                this.seasonTitle.className += ' text-orange-800';
+                this.seasonDescription.className += ' text-orange-700';
+                break;
+            case 'summer':
+                this.seasonTitle.className += ' text-white';
+                this.seasonDescription.className += ' text-white/95';
+                break;
+            case 'autumn':
+                this.seasonTitle.className += ' text-white';
+                this.seasonDescription.className += ' text-white/95';
+                break;
+            case 'winter':
+                this.seasonTitle.className += ' text-blue-900';
+                this.seasonDescription.className += ' text-blue-800';
+                break;
+        }
     }
 
     getSeasonKorean(season) {
@@ -402,13 +448,11 @@ class SeasonManager {
         const seasonButtons = document.querySelectorAll('.season-btn');
         seasonButtons.forEach(btn => {
             if (isEnabled) {
-                btn.classList.remove('disabled');
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
+                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                btn.classList.add('cursor-pointer');
             } else {
-                btn.classList.add('disabled');
-                btn.style.opacity = '0.5';
-                btn.style.cursor = 'not-allowed';
+                btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                btn.classList.remove('cursor-pointer');
             }
         });
     }
@@ -448,10 +492,15 @@ class SeasonManager {
             this.currentSeason = null;
         }
 
+        // 배경을 기본 상태로 복원
+        this.container.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        this.container.style.backgroundSize = '';
+        this.container.style.animation = '';
+
         // 버튼 상태 초기화
         const seasonButtons = document.querySelectorAll('.season-btn');
         seasonButtons.forEach(btn => {
-            btn.classList.remove('active');
+            btn.classList.remove('bg-white/40', 'border-white/60', '-translate-y-[5px]');
         });
 
         // 텍스트를 서버 연결 중으로 되돌림
@@ -494,12 +543,14 @@ class SeasonManager {
     createSpringAnimation() {
         const createPetal = () => {
             const petal = document.createElement('div');
-            petal.className = 'petal';
+            petal.className = 'absolute w-3 h-3 bg-pink-400 opacity-80 animate-petal-fall';
+            petal.style.borderRadius = '50% 0 50% 0';
 
             // 고정된 색상 클래스 할당
-            const colorClasses = ['color1', 'color2', 'color3'];
+            const colorClasses = ['bg-pink-400', 'bg-pink-300', 'bg-pink-200'];
             const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-            petal.classList.add(randomColor);
+            petal.className = `absolute w-3 h-3 ${randomColor} opacity-80 animate-petal-fall`;
+            petal.style.borderRadius = '50% 0 50% 0';
 
             petal.style.left = Math.random() * 90 + 5 + '%'; // 5-95% 범위로 제한
             petal.style.animationDuration = (Math.random() * 6 + 8) + 's';
@@ -520,12 +571,22 @@ class SeasonManager {
     createSummerAnimation() {
         const createSunbeam = () => {
             const sunbeam = document.createElement('div');
-            sunbeam.className = 'sunbeam';
+            sunbeam.className = 'absolute w-[10px] h-[10px] rounded-full opacity-90 animate-sunbeam-fall';
 
             // 고정된 색상 클래스 할당
-            const colorClasses = ['color1', 'color2', 'color3'];
-            const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-            sunbeam.classList.add(randomColor);
+            const colors = [
+                'radial-gradient(circle, #ffeb3b 20%, #ffc107 70%)',
+                'radial-gradient(circle, #ffd700 20%, #ffb347 70%)',
+                'radial-gradient(circle, #fff700 20%, #ffa500 70%)'
+            ];
+            const shadows = [
+                '0 0 6px rgba(255, 235, 59, 0.6)',
+                '0 0 6px rgba(255, 215, 0, 0.6)',
+                '0 0 6px rgba(255, 247, 0, 0.6)'
+            ];
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            sunbeam.style.background = colors[randomIndex];
+            sunbeam.style.boxShadow = shadows[randomIndex];
 
             sunbeam.style.left = Math.random() * 90 + 5 + '%';
             sunbeam.style.animationDuration = (Math.random() * 5 + 7) + 's';
@@ -545,12 +606,17 @@ class SeasonManager {
     createAutumnAnimation() {
         const createLeaf = () => {
             const leaf = document.createElement('div');
-            leaf.className = 'leaf';
+            leaf.className = 'absolute w-[14px] h-[14px] opacity-90 animate-leaf-fall';
 
-            // 고정된 색상 클래스 할당
-            const colorClasses = ['color1', 'color2', 'color3'];
-            const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-            leaf.classList.add(randomColor);
+            // 고정된 색상 및 모양 클래스 할당
+            const leafTypes = [
+                { color: 'bg-orange-600', borderRadius: '0 100% 0 100%' },
+                { color: 'bg-yellow-600', borderRadius: '100% 0 100% 0' },
+                { color: 'bg-red-600', borderRadius: '50% 0 50% 50%' }
+            ];
+            const randomLeaf = leafTypes[Math.floor(Math.random() * leafTypes.length)];
+            leaf.className += ` ${randomLeaf.color}`;
+            leaf.style.borderRadius = randomLeaf.borderRadius;
 
             leaf.style.left = Math.random() * 90 + 5 + '%';
             leaf.style.animationDuration = (Math.random() * 7 + 10) + 's';
@@ -570,7 +636,8 @@ class SeasonManager {
     createWinterAnimation() {
         const createSnowflake = () => {
             const snowflake = document.createElement('div');
-            snowflake.className = 'snowflake';
+            snowflake.className = 'absolute text-white text-base opacity-90 animate-snow-fall';
+            snowflake.style.textShadow = '0 0 4px rgba(255, 255, 255, 0.8)';
             snowflake.innerHTML = ['❄', '❅', '❆'][Math.floor(Math.random() * 3)];
             snowflake.style.left = Math.random() * 90 + 5 + '%';
             snowflake.style.animationDuration = (Math.random() * 6 + 9) + 's';
@@ -597,19 +664,19 @@ class SeasonManager {
                 this.isConnected = true;
                 // console.log('WebSocket 연결됨');
                 this.updateConnectionStatus(true, this.connectionCount);
-                
+
                 // 연결 성공 시 초기 상태 설정
                 this.setInitialContent();
             };
 
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                
+
                 // 각 타입을 독립적으로 처리
                 if (data.type === 'seasonUpdate') {
                     this.changeSeason(data.season, true);
                 }
-                
+
                 if (data.type === 'connectionCount') {
                     // ConnectionCountDto에서 count 필드 사용
                     this.updateConnectionStatus(this.isConnected, data.connectionCount);
@@ -620,10 +687,10 @@ class SeasonManager {
                 this.isConnected = false;
                 // console.log('WebSocket 연결 종료');
                 this.updateConnectionStatus(false, 0);
-                
+
                 // 연결이 끊어지면 "서버 연결 중..." 메시지로 되돌림
                 this.resetToConnectionState();
-                
+
                 // 재연결 시도 (5초 후)
                 setTimeout(() => {
                     if (!this.isConnected) {

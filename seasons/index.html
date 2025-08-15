@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -9,10 +10,10 @@
 
     <!-- Page Title -->
     <title>사계절 | Four Seasons</title>
-    
+
     <!-- SEO Meta Tags -->
     <meta name="description" content="좋아하는 계절을 선택해보세요. 각 계절에 맞는 아이콘과 설명이 표시됩니다.">
-    <meta name="keywords" content="사계절, 계절 선택, 봄, 여름, 가을, 겨울, JavaScript, HTML, CSS">
+    <meta name="keywords" content="사계절, 계절 선택, 봄, 여름, 가을, 겨울">
     <meta name="author" content="gguip1">
 
     <!-- Open Graph Meta Tags -->
@@ -26,55 +27,166 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-20C2B1J430"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-20C2B1J430');
+        gtag('config', 'G-20C2B1J430');
     </script>
 
     <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5481609101634854" crossorigin="anonymous"></script>
-    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5481609101634854"
+        crossorigin="anonymous"></script>
+
     <link rel="icon" href="../assets/icons/seasons/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./styles/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'spring-breeze': 'springBreeze 20s ease-in-out infinite',
+                        'summer-heat': 'summerHeat 25s ease-in-out infinite',
+                        'autumn-wind': 'autumnWind 18s ease-in-out infinite',
+                        'winter-chill': 'winterChill 30s ease-in-out infinite',
+                        'pulse-custom': 'pulse 2s infinite',
+                        'petal-fall': 'petalFall linear forwards',
+                        'sunbeam-fall': 'sunbeamFall linear forwards',
+                        'leaf-fall': 'leafFall linear forwards',
+                        'snow-fall': 'snowFall linear forwards',
+                    },
+                    keyframes: {
+                        springBreeze: {
+                            '0%, 100%': { 'background-position': '0% 50%', filter: 'brightness(1) saturate(1)' },
+                            '25%': { 'background-position': '25% 25%', filter: 'brightness(1.1) saturate(1.1)' },
+                            '50%': { 'background-position': '100% 50%', filter: 'brightness(1.05) saturate(1.2)' },
+                            '75%': { 'background-position': '75% 75%', filter: 'brightness(1.15) saturate(1.05)' },
+                        },
+                        summerHeat: {
+                            '0%, 100%': { filter: 'brightness(1) contrast(1)', 'background-position': '0% 50%' },
+                            '50%': { filter: 'brightness(1.2) contrast(1.1)', 'background-position': '100% 50%' },
+                        },
+                        autumnWind: {
+                            '0%, 100%': { 'background-position': '0% 50%', filter: 'brightness(1) hue-rotate(0deg)' },
+                            '50%': { 'background-position': '100% 50%', filter: 'brightness(1.05) hue-rotate(2deg)' },
+                        },
+                        winterChill: {
+                            '0%, 100%': { filter: 'brightness(0.95) blur(0px) contrast(1)', 'background-position': '0% 50%' },
+                            '50%': { filter: 'brightness(1.05) blur(0.5px) contrast(1.1)', 'background-position': '100% 50%' },
+                        },
+                        petalFall: {
+                            '0%': { transform: 'translateY(-20px) rotate(0deg)', opacity: '0' },
+                            '10%': { opacity: '0.8' },
+                            '90%': { opacity: '0.8' },
+                            '100%': { transform: 'translateY(100vh) rotate(360deg)', opacity: '0' },
+                        },
+                        sunbeamFall: {
+                            '0%': { transform: 'translateY(-20px) scale(1)', opacity: '0' },
+                            '10%': { opacity: '0.9' },
+                            '90%': { opacity: '0.9' },
+                            '100%': { transform: 'translateY(100vh) scale(1)', opacity: '0' },
+                        },
+                        leafFall: {
+                            '0%': { transform: 'translateY(-20px) rotate(0deg) translateX(0)', opacity: '0' },
+                            '10%': { opacity: '0.9' },
+                            '25%': { transform: 'translateY(25vh) rotate(90deg) translateX(10px)' },
+                            '50%': { transform: 'translateY(50vh) rotate(180deg) translateX(-10px)' },
+                            '75%': { transform: 'translateY(75vh) rotate(270deg) translateX(5px)' },
+                            '90%': { opacity: '0.9' },
+                            '100%': { transform: 'translateY(100vh) rotate(360deg) translateX(0)', opacity: '0' },
+                        },
+                        snowFall: {
+                            '0%': { transform: 'translateY(-20px) translateX(0)', opacity: '0' },
+                            '10%': { opacity: '0.9' },
+                            '90%': { opacity: '0.9' },
+                            '100%': { transform: 'translateY(100vh) translateX(15px)', opacity: '0' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --vh: 1vh;
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            --browser-ui-height: 0px;
+            --dynamic-bottom: max(20px, var(--safe-area-bottom));
+        }
+
+        html,
+        body {
+            height: calc(var(--vh, 1vh) * 100);
+            min-height: calc(var(--vh, 1vh) * 100);
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --dynamic-bottom: max(25px, var(--safe-area-bottom));
+            }
+        }
+    </style>
 </head>
-<body>
-    <div class="container" id="mainContainer">
+
+<body class="font-sans h-vh-full min-h-vh-full m-0 p-0 overflow-x-hidden relative"
+    style="-webkit-overflow-scrolling: touch;">
+    <div class="relative w-full flex flex-col justify-center items-center overflow-hidden transition-all duration-700 ease-in-out bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-600"
+        id="mainContainer" style="height: calc(var(--vh, 1vh) * 100); min-height: calc(var(--vh, 1vh) * 100);">
+
         <!-- 계절 선택 버튼들 -->
-        <div class="season-selector">
-            <button class="season-btn" data-season="spring">
-                <span class="season-icon">🌸</span>
-                <span class="season-text">봄</span>
+        <div class="absolute top-[30px] flex gap-5 z-[100] max-md:top-5 max-md:left-[10px] max-md:right-[10px] max-md:w-[calc(100%-20px)] max-md:justify-between max-md:gap-2"
+            id="seasonSelector">
+            <button
+                class="season-btn flex flex-col items-center px-5 py-[15px] bg-white/20 border-2 border-white/30 rounded-[15px] cursor-pointer transition-all duration-300 backdrop-blur-[10px] touch-manipulation hover:bg-white/30 hover:-translate-y-[3px] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] max-md:flex-1 max-md:px-2 max-md:py-3 max-md:min-w-0"
+                data-season="spring" style="-webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);">
+                <span class="text-[2.5rem] mb-2 max-md:text-[1.8rem] max-md:mb-1 max-[480px]:text-[1.5rem]">🌸</span>
+                <span
+                    class="text-white font-bold text-lg tracking-wide max-md:text-[0.9rem] max-[480px]:text-[0.8rem]">봄</span>
             </button>
-            <button class="season-btn" data-season="summer">
-                <span class="season-icon">☀️</span>
-                <span class="season-text">여름</span>
+            <button
+                class="season-btn flex flex-col items-center px-5 py-[15px] bg-white/20 border-2 border-white/30 rounded-[15px] cursor-pointer transition-all duration-300 backdrop-blur-[10px] touch-manipulation hover:bg-white/30 hover:-translate-y-[3px] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] max-md:flex-1 max-md:px-2 max-md:py-3 max-md:min-w-0"
+                data-season="summer" style="-webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);">
+                <span class="text-[2.5rem] mb-2 max-md:text-[1.8rem] max-md:mb-1 max-[480px]:text-[1.5rem]">☀️</span>
+                <span
+                    class="text-white font-bold text-lg tracking-wide max-md:text-[0.9rem] max-[480px]:text-[0.8rem]">여름</span>
             </button>
-            <button class="season-btn" data-season="autumn">
-                <span class="season-icon">🍂</span>
-                <span class="season-text">가을</span>
+            <button
+                class="season-btn flex flex-col items-center px-5 py-[15px] bg-white/20 border-2 border-white/30 rounded-[15px] cursor-pointer transition-all duration-300 backdrop-blur-[10px] touch-manipulation hover:bg-white/30 hover:-translate-y-[3px] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] max-md:flex-1 max-md:px-2 max-md:py-3 max-md:min-w-0"
+                data-season="autumn" style="-webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);">
+                <span class="text-[2.5rem] mb-2 max-md:text-[1.8rem] max-md:mb-1 max-[480px]:text-[1.5rem]">🍂</span>
+                <span
+                    class="text-white font-bold text-lg tracking-wide max-md:text-[0.9rem] max-[480px]:text-[0.8rem]">가을</span>
             </button>
-            <button class="season-btn" data-season="winter">
-                <span class="season-icon">❄️</span>
-                <span class="season-text">겨울</span>
+            <button
+                class="season-btn flex flex-col items-center px-5 py-[15px] bg-white/20 border-2 border-white/30 rounded-[15px] cursor-pointer transition-all duration-300 backdrop-blur-[10px] touch-manipulation hover:bg-white/30 hover:-translate-y-[3px] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] max-md:flex-1 max-md:px-2 max-md:py-3 max-md:min-w-0"
+                data-season="winter" style="-webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);">
+                <span class="text-[2.5rem] mb-2 max-md:text-[1.8rem] max-md:mb-1 max-[480px]:text-[1.5rem]">❄️</span>
+                <span
+                    class="text-white font-bold text-lg tracking-wide max-md:text-[0.9rem] max-[480px]:text-[0.8rem]">겨울</span>
             </button>
         </div>
 
         <!-- 메인 컨텐츠 영역 -->
-        <div class="main-content">
-            <h1 class="season-title" id="seasonTitle">서버 연결 중...</h1>
-            <p class="season-description" id="seasonDescription">느린 서버와 함께 하는 중...</p>
+        <div class="flex flex-col items-center text-center z-10 px-8">
+            <h1 class="text-6xl font-bold text-white mb-6 transition-all duration-300 ease-in-out max-md:text-[2.5rem] max-[480px]:text-4xl"
+                id="seasonTitle" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">서버 연결 중...</h1>
+            <p class="text-2xl text-white/90 max-w-[600px] leading-relaxed transition-all duration-300 ease-in-out max-md:text-xl max-md:px-4 max-[480px]:text-lg"
+                id="seasonDescription" style="text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">느린 서버와 함께 하는 중...</p>
         </div>
 
         <!-- 연결 상태 및 사용자 수 표시 -->
-        <div class="connection-status-indicator" id="connectionStatusIndicator">
-            <div class="connection-dot disconnected" id="connectionDot"></div>
+        <div class="fixed flex items-center gap-2 px-3 py-2 bg-black/20 text-white text-sm rounded-lg backdrop-blur-sm z-50 pointer-events-none max-md:text-xs max-md:px-2 max-md:py-1 max-md:right-5"
+            id="connectionStatusIndicator"
+            style="bottom: var(--dynamic-bottom); right: 20px; transform: translateZ(0); will-change: bottom;">
+            <div class="w-2 h-2 rounded-full transition-colors duration-300 disconnected bg-red-500" id="connectionDot"
+                style="box-shadow: 0 0 8px rgba(244, 67, 54, 0.6);"></div>
             <span id="connectionText">연결 끊김</span>
         </div>
 
         <!-- 현재 선택된 계절 표시 -->
-        <div class="current-season-indicator" id="currentSeasonIndicator">
+        <div class="fixed flex items-center gap-2 px-3 py-2 bg-black/20 text-white text-sm rounded-lg backdrop-blur-sm z-50 pointer-events-none max-md:text-xs max-md:px-2 max-md:py-1 max-md:left-5"
+            id="currentSeasonIndicator"
+            style="bottom: var(--dynamic-bottom); left: 20px; transform: translateZ(0); will-change: bottom;">
             <span>현재 계절: </span>
             <span id="currentSeasonText">없음</span>
         </div>
@@ -82,4 +194,5 @@
 
     <script src="./scripts/script.js"></script>
 </body>
+
 </html>
