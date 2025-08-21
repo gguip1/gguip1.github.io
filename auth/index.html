@@ -42,6 +42,8 @@
             }
         }
     </style>
+
+    <link rel="icon" href="../assets/icons/auth/favicon.ico" type="image/x-icon">
 </head>
 
 <body
@@ -160,6 +162,13 @@
                             <label for="registerEmail"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">이메일</label>
                             <input type="email" id="registerEmail" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <div class="error-message hidden mt-1 text-sm text-red-600 dark:text-red-400"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="userName"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">사용자명</label>
+                            <input type="text" id="userName" required
                                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                             <div class="error-message hidden mt-1 text-sm text-red-600 dark:text-red-400"></div>
                         </div>

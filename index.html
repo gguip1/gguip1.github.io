@@ -42,221 +42,76 @@
         crossorigin="anonymous"></script>
 
     <link rel="icon" href="./assets/icons/root_icon/favicon.ico" type="image/x-icon">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-            color: white;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .project-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            border: 2px solid transparent;
-        }
-
-        .project-card:hover {
-            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
-            border: 2px solid rgba(102, 126, 234, 0.5);
-        }
-
-        .project-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .project-card:hover .project-icon {
-            filter: brightness(1.2);
-        }
-
-        .project-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #2c3e50;
-            transition: color 0.3s ease;
-        }
-
-        .project-card:hover .project-title {
-            color: #667eea;
-        }
-
-        .project-description {
-            color: #7f8c8d;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .project-status {
-            display: inline-block;
-            padding: 0.3rem 1rem;
-            background: #e8f5e8;
-            color: #27ae60;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .no-projects {
-            text-align: center;
-            color: white;
-            font-size: 1.1rem;
-            opacity: 0.8;
-        }
-
-        /* 푸터 스타일 */
-        .footer {
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            color: white;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .footer-item a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-item a:hover {
-            color: #fff;
-            text-decoration: underline;
-        }
-
-        .footer-bottom {
-            font-size: 0.8rem;
-            opacity: 0.6;
-            margin-top: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .projects-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .footer-content {
-                flex-direction: column;
-                gap: 1rem;
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2'
+                    }
+                }
             }
         }
-    </style>
+    </script>
 </head>
 
-<body>
-    <div class="container">
-        <header>
-            <h1>🧸 장난감 통</h1>
-            <p class="subtitle">작은 아이디어, 재미있는 실험실</p>
+<body class="font-sans bg-gradient-to-br from-primary to-secondary min-h-screen text-gray-800">
+    <div class="max-w-6xl mx-auto p-8">
+        <header class="text-center mb-12 text-white">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4 drop-shadow-lg">🧸 장난감 통</h1>
+            <p class="text-xl opacity-90">작은 아이디어, 재미있는 실험실</p>
         </header>
 
         <div id="projects-container">
-            <div class="projects-grid" id="projects-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12" id="projects-grid">
                 <!-- 프로젝트들이 여기에 동적으로 추가됩니다 -->
             </div>
 
-            <div class="no-projects" id="no-projects" style="display: none;">
+            <div class="text-center text-white text-lg opacity-80 hidden" id="no-projects">
                 <p>아직 프로젝트가 없습니다. 새로운 프로젝트를 만들어보세요!</p>
             </div>
         </div>
 
         <!-- 푸터 섹션 -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-item">
+        <footer class="mt-16 pt-8 border-t border-white border-opacity-20 text-center text-white">
+            <!-- 서버 상태 확인 영역 -->
+            <div class="mb-6 p-4 bg-white bg-opacity-10 rounded-lg backdrop-blur-sm">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <span class="text-lg">🖥️</span>
+                    <h3 class="text-lg font-semibold">서버 상태</h3>
+                </div>
+                <div id="server-status" class="flex items-center justify-center gap-2">
+                    <div class="w-3 h-3 bg-gray-400 rounded-full animate-pulse"></div>
+                    <span class="text-sm opacity-80">확인 중...</span>
+                </div>
+                <div id="server-response-time" class="text-xs opacity-60 mt-1"></div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-4">
+                <div class="flex items-center gap-2 text-sm opacity-80">
                     <span>🧑‍💻</span>
                     <span>gguip1</span>
                 </div>
 
-                <div class="footer-item">
+                <div class="flex items-center gap-2 text-sm opacity-80">
                     <span>📂</span>
-                    <a href="https://github.com/gguip1" target="_blank">GitHub: github.com/gguip1</a>
+                    <a href="https://github.com/gguip1" target="_blank"
+                        class="hover:text-white hover:underline transition-colors duration-300">
+                        GitHub: github.com/gguip1
+                    </a>
                 </div>
 
-                <div class="footer-item">
+                <div class="flex items-center gap-2 text-sm opacity-80">
                     <span>📋</span>
                     <span>MIT License</span>
                 </div>
             </div>
 
-            <div class="footer-bottom">
+            <div class="text-xs opacity-60 mt-4">
                 <p>&copy; 2025 gguip1 | 모든 프로젝트는 학습 목적으로 제작되었습니다.</p>
             </div>
         </footer>
@@ -284,11 +139,23 @@
         // 프로젝트 카드 생성 함수
         function createProjectCard(project) {
             return `
-                <a href="${project.folder}/" class="project-card">
-                    <div class="project-icon">${project.icon}</div>
-                    <div class="project-title">${project.name}</div>
-                    <div class="project-description">${project.description}</div>
-                    <div class="project-status">${project.status}</div>
+                <a href="${project.folder}/" class="block bg-white rounded-2xl p-8 shadow-xl transition-all duration-300 
+                          hover:shadow-2xl hover:shadow-primary/40 hover:border-2 hover:border-primary/50 
+                          border-2 border-transparent group">
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-xl 
+                              flex items-center justify-center mb-4 text-2xl text-white 
+                              group-hover:brightness-110 transition-all duration-300">
+                        ${project.icon}
+                    </div>
+                    <div class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-primary transition-colors duration-300">
+                        ${project.name}
+                    </div>
+                    <div class="text-gray-600 leading-relaxed mb-4">
+                        ${project.description}
+                    </div>
+                    <div class="inline-block px-4 py-1.5 bg-green-100 text-green-600 rounded-full text-sm font-medium">
+                        ${project.status}
+                    </div>
                 </a>
             `;
         }
@@ -299,18 +166,56 @@
             const noProjects = document.getElementById('no-projects');
 
             if (projects.length === 0) {
-                projectsGrid.style.display = 'none';
-                noProjects.style.display = 'block';
+                projectsGrid.classList.add('hidden');
+                noProjects.classList.remove('hidden');
             } else {
-                projectsGrid.style.display = 'grid';
-                noProjects.style.display = 'none';
+                projectsGrid.classList.remove('hidden');
+                noProjects.classList.add('hidden');
                 projectsGrid.innerHTML = projects.map(createProjectCard).join('');
+            }
+        }
+
+        // 서버 상태 확인 함수
+        async function checkServerStatus() {
+            const statusElement = document.getElementById('server-status');
+            const responseTimeElement = document.getElementById('server-response-time');
+            const healthUrl = 'https://api-gguip1-github-io-833999348511.asia-northeast3.run.app/health/';
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch(healthUrl);
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                if (response.ok) {
+                    statusElement.innerHTML = `
+                        <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                        <span class="text-sm">서버 정상</span>
+                    `;
+                    responseTimeElement.textContent = `응답 시간: ${responseTime}ms`;
+                } else {
+                    statusElement.innerHTML = `
+                        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                        <span class="text-sm">서버 오류 (${response.status})</span>
+                    `;
+                    responseTimeElement.textContent = `응답 시간: ${responseTime}ms`;
+                }
+            } catch (error) {
+                statusElement.innerHTML = `
+                    <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <span class="text-sm">서버 연결 불가</span>
+                `;
+                responseTimeElement.textContent = '연결 실패';
             }
         }
 
         // 페이지 로드 시 실행
         document.addEventListener('DOMContentLoaded', function () {
             renderProjects();
+            checkServerStatus();
+
+            // 30초마다 서버 상태 확인
+            setInterval(checkServerStatus, 30000);
         });
     </script>
 </body>

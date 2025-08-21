@@ -92,6 +92,10 @@ class AuthManager {
             input.addEventListener('blur', () => this.validateEmail(input));
         });
 
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            input.addEventListener('blur', () => this.validateUserName(input));
+        });
+
         // 비밀번호 검사
         document.querySelectorAll('input[type="password"]').forEach(input => {
             input.addEventListener('blur', () => this.validatePassword(input));
@@ -116,6 +120,18 @@ class AuthManager {
 
         if (!emailRegex.test(email)) {
             this.showFieldError(input, '올바른 이메일 형식이 아닙니다.');
+            return false;
+        }
+
+        this.clearFieldError(input);
+        return true;
+    }
+
+    validateUserName(input) {
+        const userName = input.value.trim();
+
+        if (!userName) {
+            this.showFieldError(input, '사용자명을 입력해주세요.');
             return false;
         }
 
@@ -243,16 +259,18 @@ class AuthManager {
     async handleRegister() {
         const form = document.getElementById('registerForm');
         const emailInput = document.getElementById('registerEmail');
+        const userNameInput = document.getElementById('userName');
         const passwordInput = document.getElementById('registerPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
         const submitBtn = form.querySelector('button[type="submit"]');
 
         // 유효성 검사
         const isEmailValid = this.validateEmail(emailInput);
+        const isUserNameValid = this.validateUserName(userNameInput);
         const isPasswordValid = this.validatePassword(passwordInput);
         const isPasswordMatch = this.validatePasswordMatch();
 
-        if (!isEmailValid || !isPasswordValid || !isPasswordMatch) {
+        if (!isEmailValid || !isUserNameValid || !isPasswordValid || !isPasswordMatch) {
             return;
         }
 
@@ -261,6 +279,7 @@ class AuthManager {
         try {
             const response = await window.apiClient.register(
                 emailInput.value.trim(),
+                userNameInput.value.trim(),
                 passwordInput.value
             );
 
