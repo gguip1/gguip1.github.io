@@ -6,12 +6,13 @@
 class ApiClient {
     constructor() {
         // MOCK 모드 토글 - 개발 시 true, 프로덕션 시 false
-        this.MOCK = true;
-        this.baseURL = 'https://api.example.com'; // 실제 API URL로 변경
+        this.MOCK = false;
+        this.baseURL = 'https://api-gguip1-github-io-833999348511.asia-northeast3.run.app';
         this.token = this.getToken();
+        this.refreshing = null; // 중복 refresh 요청 방지
     }
 
-    // JWT 토큰 관리
+    // JWT 토큰 관리 (access token만 localStorage에 저장)
     saveToken(token) {
         localStorage.setItem('auth_token', token);
         this.token = token;
@@ -26,14 +27,58 @@ class ApiClient {
         this.token = null;
     }
 
-    // HTTP 요청 헬퍼
+    // 토큰 갱신
+    async refreshToken() {
+        // 이미 refresh 요청이 진행 중이면 기다림
+        if (this.refreshing) {
+            return this.refreshing;
+        }
+
+        try {
+            this.refreshing = fetch(`${this.baseURL}/accounts/refresh/`, {
+                method: 'POST',
+                credentials: 'include', // httpOnly 쿠키 전송
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const response = await this.refreshing;
+
+            if (!response.ok) {
+                throw new Error('Token refresh failed');
+            }
+
+            const data = await response.json();
+
+            if (data.access) {
+                this.saveToken(data.access);
+                return data.access;
+            } else {
+                throw new Error('No access token in refresh response');
+            }
+        } catch (error) {
+            // refresh 실패 시 로그아웃 처리
+            this.clearToken();
+            throw error;
+        } finally {
+            this.refreshing = null;
+        }
+    }
+
+    // HTTP 요청 헬퍼 (자동 토큰 갱신 포함)
     async request(endpoint, options = {}) {
         if (this.MOCK) {
             return this.mockRequest(endpoint, options);
         }
 
+        return this._requestWithRetry(endpoint, options);
+    }
+
+    async _requestWithRetry(endpoint, options = {}, isRetry = false) {
         const url = `${this.baseURL}${endpoint}`;
         const config = {
+            credentials: 'include', // 쿠키 전송
             headers: {
                 'Content-Type': 'application/json',
                 ...(this.token && { Authorization: `Bearer ${this.token}` }),
@@ -48,88 +93,92 @@ class ApiClient {
 
         try {
             const response = await fetch(url, config);
-            const data = await response.json();
+
+            // 401 에러이고 아직 재시도하지 않았다면 토큰 갱신 후 재시도
+            if (response.status === 401 && !isRetry && this.token) {
+                try {
+                    await this.refreshToken();
+                    // 새로운 토큰으로 원래 요청 재시도
+                    const updatedConfig = {
+                        ...config,
+                        headers: {
+                            ...config.headers,
+                            Authorization: `Bearer ${this.token}`
+                        }
+                    };
+                    return this._requestWithRetry(endpoint, { ...options, headers: updatedConfig.headers }, true);
+                } catch (refreshError) {
+                    // refresh 실패 시 로그인 페이지로 리다이렉트
+                    window.location.href = '/auth/';
+                    throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
+                }
+            }
+
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                throw new Error(data.error || `HTTP ${response.status}`);
+                throw new Error(data.detail || data.error || `HTTP ${response.status}`);
             }
 
             return data;
         } catch (error) {
-            throw new Error(error.message || '네트워크 오류가 발생했습니다.');
+            if (error.message.includes('Failed to fetch')) {
+                throw new Error('네트워크 오류가 발생했습니다.');
+            }
+            throw error;
         }
     }
 
-    // MOCK API 응답
-    async mockRequest(endpoint, options = {}) {
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(800); // 네트워크 지연 시뮬레이션
+    // API 메서드들
+    async login(email, password) {
+        const response = await this.request('/accounts/login/', {
+            method: 'POST',
+            body: { email, password }
+        });
 
-        const { method = 'GET', body } = options;
-        const data = body ? (typeof body === 'string' ? JSON.parse(body) : body) : {};
-
-        switch (`${method} ${endpoint}`) {
-            case 'POST /auth/login':
-                if (data.email === 'test@example.com' && data.password === 'password123') {
-                    const mockToken = this.generateMockJWT(data.email);
-                    return { token: mockToken, user: { email: data.email, name: '테스트 사용자' } };
-                } else {
-                    throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
-                }
-
-            case 'POST /auth/register':
-                if (data.email === 'existing@example.com') {
-                    throw new Error('이미 존재하는 이메일입니다.');
-                }
-                const regToken = this.generateMockJWT(data.email);
-                return { token: regToken, user: { email: data.email, name: '새 사용자' } };
-
-            case 'POST /auth/forgot':
-                return { message: '비밀번호 재설정 링크를 이메일로 전송했습니다.' };
-
-            case 'GET /users/me':
-                if (this.token) {
-                    try {
-                        const payload = this.decodeJwt(this.token);
-                        return { email: payload.email, name: payload.name || '사용자' };
-                    } catch {
-                        throw new Error('유효하지 않은 토큰입니다.');
-                    }
-                } else {
-                    throw new Error('인증이 필요합니다.');
-                }
-
-            default:
-                throw new Error('지원하지 않는 엔드포인트입니다.');
+        if (response.access) {
+            this.saveToken(response.access);
         }
+
+        return response;
     }
 
-    // MOCK JWT 생성 (개발용만)
-    generateMockJWT(email) {
-        const header = this.base64UrlEncode(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-        const payload = this.base64UrlEncode(JSON.stringify({
-            email,
-            name: '테스트 사용자',
-            exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1시간 후 만료
-            iat: Math.floor(Date.now() / 1000)
-        }));
-        const signature = 'mock-signature';
-        return `${header}.${payload}.${signature}`;
+    async register(email, username, password) {
+        const response = await this.request('/accounts/register/', {
+            method: 'POST',
+            body: { email, username, password }
+        });
+
+        if (response.access) {
+            this.saveToken(response.access);
+        }
+
+        return response;
     }
 
-    // UTF-8 안전한 Base64 인코딩
-    base64UrlEncode(str) {
+    async forgotPassword(email) {
+        return await this.request('/auth/forgot', {
+            method: 'POST',
+            body: { email }
+        });
+    }
+
+    async getCurrentUser() {
+        return await this.request('/accounts/me/');
+    }
+
+    async logout() {
         try {
-            // UTF-8 문자를 안전하게 처리
-            const utf8Bytes = new TextEncoder().encode(str);
-            const base64 = btoa(String.fromCharCode(...utf8Bytes));
-            // Base64 URL-safe 변환
-            return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+            // 서버에 로그아웃 요청 (refresh 쿠키 제거)
+            await this.request('/accounts/logout/', {
+                method: 'POST'
+            });
         } catch (error) {
-            console.error('Base64 encoding error:', error);
-            // 폴백: 한글 제거 후 인코딩
-            const asciiOnly = str.replace(/[^\x00-\x7F]/g, "");
-            return btoa(asciiOnly);
+            // 로그아웃은 항상 성공으로 처리
+            console.warn('Logout API call failed:', error);
+        } finally {
+            // 로컬 토큰 제거
+            this.clearToken();
         }
     }
 
@@ -157,48 +206,6 @@ class ApiClient {
         } catch (error) {
             throw new Error('토큰 디코딩 실패');
         }
-    }
-
-    // API 메서드들
-    async login(email, password) {
-        const response = await this.request('/auth/login', {
-            method: 'POST',
-            body: { email, password }
-        });
-
-        if (response.token) {
-            this.saveToken(response.token);
-        }
-
-        return response;
-    }
-
-    async register(email, password) {
-        const response = await this.request('/auth/register', {
-            method: 'POST',
-            body: { email, password }
-        });
-
-        if (response.token) {
-            this.saveToken(response.token);
-        }
-
-        return response;
-    }
-
-    async forgotPassword(email) {
-        return await this.request('/auth/forgot', {
-            method: 'POST',
-            body: { email }
-        });
-    }
-
-    async getCurrentUser() {
-        return await this.request('/users/me');
-    }
-
-    logout() {
-        this.clearToken();
     }
 }
 

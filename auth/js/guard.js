@@ -157,6 +157,7 @@ class AuthGuard {
             this.setupExpiryTimer();
             this.showToast('로그인되었습니다.', 'success');
         } catch (error) {
+            console.log(error);
             this.showToast('로그인 처리 중 오류가 발생했습니다.', 'error');
         }
     }
