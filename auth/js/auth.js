@@ -280,7 +280,8 @@ class AuthManager {
             const response = await window.apiClient.register(
                 emailInput.value.trim(),
                 userNameInput.value.trim(),
-                passwordInput.value
+                passwordInput.value,
+                confirmPasswordInput.value
             );
 
             this.showToast('회원가입이 완료되었습니다!', 'success');

@@ -143,10 +143,10 @@ class ApiClient {
         return response;
     }
 
-    async register(email, username, password) {
+    async register(email, username, password, password2) {
         const response = await this.request('/accounts/register/', {
             method: 'POST',
-            body: { email, username, password }
+            body: { email, username, password, password2 }
         });
 
         if (response.access) {
