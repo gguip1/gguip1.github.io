@@ -28,10 +28,10 @@ class AuthManager {
             this.handleRegister();
         });
 
-        document.getElementById('forgotForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleForgotPassword();
-        });
+        // document.getElementById('forgotForm').addEventListener('submit', (e) => {
+        //     e.preventDefault();
+        //     this.handleForgotPassword();
+        // });
 
         // 로그아웃
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -280,8 +280,7 @@ class AuthManager {
             const response = await window.apiClient.register(
                 emailInput.value.trim(),
                 userNameInput.value.trim(),
-                passwordInput.value,
-                confirmPasswordInput.value
+                passwordInput.value
             );
 
             this.showToast('회원가입이 완료되었습니다!', 'success');
@@ -294,29 +293,29 @@ class AuthManager {
         }
     }
 
-    // 비밀번호 재설정 처리
-    async handleForgotPassword() {
-        const form = document.getElementById('forgotForm');
-        const emailInput = document.getElementById('forgotEmail');
-        const submitBtn = form.querySelector('button[type="submit"]');
+    // // 비밀번호 재설정 처리
+    // async handleForgotPassword() {
+    //     const form = document.getElementById('forgotForm');
+    //     const emailInput = document.getElementById('forgotEmail');
+    //     const submitBtn = form.querySelector('button[type="submit"]');
 
-        // 유효성 검사
-        if (!this.validateEmail(emailInput)) {
-            return;
-        }
+    //     // 유효성 검사
+    //     if (!this.validateEmail(emailInput)) {
+    //         return;
+    //     }
 
-        this.setButtonLoading(submitBtn, true);
+    //     this.setButtonLoading(submitBtn, true);
 
-        try {
-            const response = await window.apiClient.forgotPassword(emailInput.value.trim());
-            this.showToast(response.message, 'success');
-            form.reset();
-        } catch (error) {
-            this.showToast(error.message, 'error');
-        } finally {
-            this.setButtonLoading(submitBtn, false);
-        }
-    }
+    //     try {
+    //         const response = await window.apiClient.forgotPassword(emailInput.value.trim());
+    //         this.showToast(response.message, 'success');
+    //         form.reset();
+    //     } catch (error) {
+    //         this.showToast(error.message, 'error');
+    //     } finally {
+    //         this.setButtonLoading(submitBtn, false);
+    //     }
+    // }
 
     // 다크모드 초기화
     initDarkMode() {
@@ -378,23 +377,3 @@ window.showToast = (message, type) => {
 document.addEventListener('DOMContentLoaded', () => {
     window.authManager = new AuthManager();
 });
-
-/* 
-테스트 체크리스트:
-✓ 모바일 375px에서 UI 정상 동작
-✓ 잘못된 자격증명 시 에러 토스트 표시
-✓ 로그인 후 UI 전환 정상 작동
-✓ 토큰 만료 임박 시 경고 표시
-✓ 로그아웃 시 상태 초기화 확인
-✓ MOCK 모드에서 가짜 응답 동작 확인
-✓ 키보드 접근성 (Tab, Enter) 지원
-✓ 다크모드 토글 정상 작동
-✓ 실시간 유효성 검사 동작
-✓ 반응형 레이아웃 테스트 (375px ~ 1920px)
-
-프로덕션 배포 전 확인사항:
-- api.js에서 MOCK = false로 변경
-- baseURL을 실제 API 서버로 변경
-- HTTPS 환경에서 배포
-- CSP 헤더 설정
-*/
