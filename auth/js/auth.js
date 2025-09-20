@@ -246,7 +246,7 @@ class AuthManager {
                 passwordInput.value
             );
 
-            window.authGuard.onLoginSuccess(response.user);
+            await window.authGuard.onLoginSuccess(response.user);
             form.reset();
         } catch (error) {
             this.showToast(error.message, 'error');
@@ -280,11 +280,23 @@ class AuthManager {
             const response = await window.apiClient.register(
                 emailInput.value.trim(),
                 userNameInput.value.trim(),
-                passwordInput.value
+                passwordInput.value,
+                confirmPasswordInput.value
             );
 
-            this.showToast('회원가입이 완료되었습니다!', 'success');
-            window.authGuard.onLoginSuccess(response.user);
+            // 백엔드에서 온 메시지 사용 또는 기본 메시지
+            const successMessage = response.message || '회원가입이 완료되었습니다! 로그인해주세요.';
+            this.showToast(successMessage, 'success');
+
+            // 회원가입 후 로그인 탭으로 전환
+            this.switchTab('login');
+
+            // 가입한 이메일을 로그인 폼에 미리 입력
+            const loginEmailInput = document.getElementById('loginEmail');
+            if (loginEmailInput) {
+                loginEmailInput.value = emailInput.value.trim();
+            }
+
             form.reset();
         } catch (error) {
             this.showToast(error.message, 'error');

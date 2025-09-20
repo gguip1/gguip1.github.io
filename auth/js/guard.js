@@ -144,10 +144,23 @@ class AuthGuard {
     }
 
     // 로그인 성공 처리
-    onLoginSuccess(userData) {
+    async onLoginSuccess(userData = null) {
         try {
             const token = window.apiClient.getToken();
             const payload = window.apiClient.decodeJwt(token);
+
+            // 토큰에서 사용자 정보가 부족하면 API에서 가져오기
+            if (!userData || !userData.email) {
+                try {
+                    userData = await window.apiClient.getCurrentUser();
+                } catch (apiError) {
+                    console.warn('사용자 정보 조회 실패, 토큰 정보 사용:', apiError);
+                    userData = {
+                        email: payload.email || 'unknown@example.com',
+                        name: payload.name || '사용자'
+                    };
+                }
+            }
 
             this.user = userData;
             this.tokenExpiry = payload.exp;

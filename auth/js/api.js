@@ -268,26 +268,25 @@ class ApiClient {
         return response;
     }
 
-    async register(email, password) {
+    async register(email, userName, password, password2) {
         const response = await this.request('/accounts/register/', {
             method: 'POST',
-            body: { email, password }
+            body: {
+                username: userName,
+                email,
+                password,
+                password2
+            }
         });
 
         this.debug('Register response:', response);
 
-        // 다양한 토큰 필드명 확인
-        const token = response.token || response.access || response.access_token || response.accessToken;
-
-        if (token) {
-            this.saveToken(token);
-            this.debug('Token saved:', token);
-        } else {
-            this.debugError('No token found in response:', response);
-            throw new Error('서버에서 토큰을 받지 못했습니다.');
-        }
-
-        return response;
+        // 회원가입은 토큰을 반환하지 않음 - 별도 로그인 필요
+        // 일반적으로 201 Created 상태코드와 함께 성공 메시지 반환
+        return {
+            ...response,
+            message: response.message || '회원가입이 성공적으로 완료되었습니다.'
+        };
     }
 
     async forgotPassword(email) {
