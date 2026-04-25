@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 120" width="600" height="120">
+  <!--
+    Calligraphic fountain-pen signature: 이 기 용
+    stroke="currentColor" so the color is controlled by CSS context
+    All strokes: round linecap, round linejoin, stroke-width=5
+  -->
+  <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- ㅇ (이 upper circle component) -->
+    <ellipse cx="115" cy="38" rx="18" ry="14" fill="none" stroke="currentColor" stroke-width="5"/>
+    <!-- ㅣ (이 vertical stroke, right side) -->
+    <line x1="140" y1="22" x2="140" y2="98"/>
+    <!-- 이 bottom horizontal foot -->
+    <line x1="85" y1="98" x2="140" y2="98"/>
+    <!-- 이 left vertical -->
+    <line x1="85" y1="22" x2="85" y2="98"/>
+    <!-- 이 top horizontal -->
+    <line x1="85" y1="22" x2="140" y2="22"/>
+
+    <!-- 기 — square-bracket L-shape with serif feel -->
+    <!-- Top horizontal -->
+    <path d="M 215,22 C 240,20 295,20 325,22"/>
+    <!-- Left vertical descending -->
+    <path d="M 215,22 C 213,50 213,75 215,98"/>
+    <!-- Bottom horizontal -->
+    <path d="M 215,98 C 250,100 300,100 325,98"/>
+    <!-- Short right tick at top right (calligraphic detail) -->
+    <path d="M 325,22 C 327,30 327,38 325,45"/>
+
+    <!-- 용 — oval head + descending strokes -->
+    <!-- Upper oval (ㅇ component) -->
+    <path d="M 390,22 C 375,28 370,45 380,55 C 390,65 415,65 425,55 C 435,45 432,28 418,22 C 412,19 396,19 390,22 Z"/>
+    <!-- Left descending stroke from oval -->
+    <path d="M 380,60 C 378,72 376,82 375,98"/>
+    <!-- Center descending stroke -->
+    <path d="M 404,65 C 404,76 404,86 404,98"/>
+    <!-- Right descending stroke -->
+    <path d="M 425,60 C 427,72 430,82 432,98"/>
+    <!-- Bottom horizontal connecting the three strokes -->
+    <path d="M 372,98 C 385,100 418,100 435,98"/>
+
+  </g>
+</svg>
