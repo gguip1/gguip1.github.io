@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --page-bg: #f3ece0;
+  --page-fg: #0a0908;
+  --page-muted: #5c5446;
+  --page-rule: #d6cdb9;
+}
+
+.theme-white {
+  --page-bg: #ffffff;
+  --page-fg: #0a0908;
+  --page-muted: #6a6a6a;
+  --page-rule: #e4e4e4;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--page-bg);
+    color: var(--page-fg);
+    @apply font-sans antialiased;
+    font-feature-settings: 'ss01', 'ss02';
+  }
+
+  ::selection {
+    @apply bg-ink text-paper;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ink ring-offset-4;
+    --tw-ring-offset-color: var(--page-bg);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .tracking-kr {
+    letter-spacing: -0.04em;
+  }
+  .break-keep {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  .rule {
+    @apply block h-px w-full bg-ink origin-left;
+  }
+  .stamp-mark {
+    @apply text-stamp-hot;
+    text-shadow: 0.02em 0.02em 0 rgba(255, 90, 61, 0.15);
+  }
+
+  [data-visible='false'] {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  [data-visible='true'] {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 0.9s cubic-bezier(0.2, 0.7, 0.1, 1),
+      transform 0.9s cubic-bezier(0.2, 0.7, 0.1, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-visible='false'],
+    [data-visible='true'] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .animate-fade-rise,
+    .animate-reveal-up,
+    .animate-rule-grow,
+    .animate-marquee-x,
+    .animate-mesh-drift {
+      animation: none !important;
+    }
+  }
+}
+
+.prose-gallery {
+  font-family: theme('fontFamily.sans');
+  color: var(--page-fg);
+  font-size: 17px;
+  line-height: 1.8;
+}
+.prose-gallery h2 {
+  @apply font-serif text-3xl font-bold tracking-kr mt-16 mb-4;
+}
+.prose-gallery h3 {
+  @apply font-serif text-2xl font-bold tracking-kr mt-12 mb-3;
+}
+.prose-gallery p {
+  @apply my-5;
+}
+.prose-gallery p a,
+.prose-gallery li a,
+.prose-gallery td a {
+  @apply text-vermillion underline underline-offset-4 decoration-1 hover:decoration-2;
+}
+.prose-gallery h2 a,
+.prose-gallery h3 a,
+.prose-gallery h4 a {
+  @apply text-ink no-underline;
+}
+.prose-gallery ul {
+  @apply my-5 space-y-2 pl-0;
+}
+.prose-gallery ul li {
+  @apply flex gap-3 break-keep;
+}
+.prose-gallery ul li::before {
+  content: '·';
+  @apply font-mono text-vermillion;
+}
+.prose-gallery ol {
+  @apply my-5 space-y-2 list-decimal list-inside;
+}
+.prose-gallery blockquote {
+  @apply my-8 border-l-2 border-vermillion pl-5 italic text-ghost;
+}
+.prose-gallery code {
+  @apply rounded-sm bg-mist-deep px-1.5 py-0.5 font-mono text-[0.9em];
+}
+.prose-gallery pre {
+  @apply my-6 overflow-x-auto rounded-none border border-rule-soft bg-mist p-5 font-mono text-sm leading-relaxed;
+}
+.prose-gallery pre code {
+  @apply bg-transparent p-0;
+}
+.prose-gallery hr {
+  @apply my-12 border-0 border-t border-rule-soft;
+}
+.prose-gallery strong {
+  @apply font-bold text-ink;
+}
+.prose-gallery table {
+  @apply my-6 w-full border-collapse;
+}
+.prose-gallery th,
+.prose-gallery td {
+  @apply border-b border-rule-soft py-3 px-4 text-left;
+}
+.prose-gallery th {
+  @apply font-mono text-[0.7rem] uppercase tracking-[0.25em] text-ghost;
+}
