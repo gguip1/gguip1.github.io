@@ -1,223 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Page Title -->
-    <title>개발자 포털 | Toy Projects</title>
-
-    <!-- Google Site Verification -->
-    <meta name="google-site-verification" content="ss_UDGVj7PCkEr1FpzMHRNyN2mGlSP1Zd3W7goWq1RM" />
-
-    <!-- Naver Site Verification -->
-    <meta name="naver-site-verification" content="9ddd1e7a803c92462b24228bfc0be4d42ae3cfa6" />
-
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="개발자 포털 - 토이 프로젝트 모음">
-    <meta name="keywords" content="개발자, 포털, 토이 프로젝트, 웹 개발, JavaScript, HTML, CSS">
-    <meta name="author" content="gguip1">
-
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="개발자 포털 | Toy Projects">
-    <meta property="og:description" content="개발자 포털 - 토이 프로젝트 모음">
-    <meta property="og:image" content="./assets/images/root/og_image.png">
-    <meta property="og:url" content="https://gguip1.github.io/">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="개발자 포털">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-20C2B1J430"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#f3ece0" />
+    <meta name="description" content="이기용 · GiYong Lee — 실패를 투명하게 마주하고, 데이터로 정답을 찾아가는 데브옵스 엔지니어." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700;900&family=IBM+Plex+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <title>gguip1 · 이기용</title>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-20C2B1J430');
+      (function (l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search
+            .slice(1)
+            .split('&')
+            .map(function (s) { return s.replace(/~and~/g, '&') })
+            .join('?')
+          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash)
+        }
+      })(window.location)
     </script>
-
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5481609101634854"
-        crossorigin="anonymous"></script>
-
-    <link rel="icon" href="./assets/icons/root_icon/favicon.ico" type="image/x-icon">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#667eea',
-                        secondary: '#764ba2'
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-
-<body class="font-sans bg-gradient-to-br from-primary to-secondary min-h-screen text-gray-800">
-    <div class="max-w-6xl mx-auto p-8">
-        <header class="text-center mb-12 text-white">
-            <h1 class="text-5xl md:text-6xl font-bold mb-4 drop-shadow-lg">🧸 장난감 통</h1>
-            <p class="text-xl opacity-90">작은 아이디어, 재미있는 실험실</p>
-        </header>
-
-        <div id="projects-container">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12" id="projects-grid">
-                <!-- 프로젝트들이 여기에 동적으로 추가됩니다 -->
-            </div>
-
-            <div class="text-center text-white text-lg opacity-80 hidden" id="no-projects">
-                <p>아직 프로젝트가 없습니다. 새로운 프로젝트를 만들어보세요!</p>
-            </div>
-        </div>
-
-        <!-- 푸터 섹션 -->
-        <footer class="mt-16 pt-8 border-t border-white border-opacity-20 text-center text-white">
-            <!-- 서버 상태 확인 영역 -->
-            <div class="mb-6 p-4 bg-white bg-opacity-10 rounded-lg backdrop-blur-sm">
-                <div class="flex items-center justify-center gap-3 mb-2">
-                    <span class="text-lg">🖥️</span>
-                    <h3 class="text-lg font-semibold">서버 상태</h3>
-                </div>
-                <div id="server-status" class="flex items-center justify-center gap-2">
-                    <div class="w-3 h-3 bg-gray-400 rounded-full animate-pulse"></div>
-                    <span class="text-sm opacity-80">확인 중...</span>
-                </div>
-                <div id="server-response-time" class="text-xs opacity-60 mt-1"></div>
-            </div>
-
-            <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-4">
-                <div class="flex items-center gap-2 text-sm opacity-80">
-                    <span>🧑‍💻</span>
-                    <span>gguip1</span>
-                </div>
-
-                <div class="flex items-center gap-2 text-sm opacity-80">
-                    <span>📂</span>
-                    <a href="https://github.com/gguip1" target="_blank"
-                        class="hover:text-white hover:underline transition-colors duration-300">
-                        GitHub: github.com/gguip1
-                    </a>
-                </div>
-
-                <div class="flex items-center gap-2 text-sm opacity-80">
-                    <span>📋</span>
-                    <span>MIT License</span>
-                </div>
-            </div>
-
-            <div class="text-xs opacity-60 mt-4">
-                <p>&copy; 2025 gguip1 | 모든 프로젝트는 학습 목적으로 제작되었습니다.</p>
-            </div>
-        </footer>
-    </div>
-
-    <script>
-        // 프로젝트 목록 (새 프로젝트 추가 시 여기에 추가하세요)
-        const projects = [
-            {
-                name: "Seasons",
-                folder: "seasons",
-                description: "WebSocket을 이용해 접속한 모든 사용자가 동일한 계절 상태를 실시간으로 공유하는 웹 애플리케이션",
-                icon: "🍂",
-                status: "Live"
-            },
-            {
-                name: "인증",
-                folder: "auth",
-                description: "준비 중인 인증 시스템",
-                icon: "🔑",
-                status: "Live"
-            },
-        ];
-
-        // 프로젝트 카드 생성 함수
-        function createProjectCard(project) {
-            return `
-                <a href="${project.folder}/" class="block bg-white rounded-2xl p-8 shadow-xl transition-all duration-300 
-                          hover:shadow-2xl hover:shadow-primary/40 hover:border-2 hover:border-primary/50 
-                          border-2 border-transparent group">
-                    <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-xl 
-                              flex items-center justify-center mb-4 text-2xl text-white 
-                              group-hover:brightness-110 transition-all duration-300">
-                        ${project.icon}
-                    </div>
-                    <div class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-primary transition-colors duration-300">
-                        ${project.name}
-                    </div>
-                    <div class="text-gray-600 leading-relaxed mb-4">
-                        ${project.description}
-                    </div>
-                    <div class="inline-block px-4 py-1.5 bg-green-100 text-green-600 rounded-full text-sm font-medium">
-                        ${project.status}
-                    </div>
-                </a>
-            `;
-        }
-
-        // 프로젝트 목록 렌더링
-        function renderProjects() {
-            const projectsGrid = document.getElementById('projects-grid');
-            const noProjects = document.getElementById('no-projects');
-
-            if (projects.length === 0) {
-                projectsGrid.classList.add('hidden');
-                noProjects.classList.remove('hidden');
-            } else {
-                projectsGrid.classList.remove('hidden');
-                noProjects.classList.add('hidden');
-                projectsGrid.innerHTML = projects.map(createProjectCard).join('');
-            }
-        }
-
-        // 서버 상태 확인 함수
-        async function checkServerStatus() {
-            const statusElement = document.getElementById('server-status');
-            const responseTimeElement = document.getElementById('server-response-time');
-            const healthUrl = 'https://api-gguip1-github-io-833999348511.asia-northeast3.run.app/health/';
-
-            try {
-                const startTime = Date.now();
-                const response = await fetch(healthUrl);
-                const endTime = Date.now();
-                const responseTime = endTime - startTime;
-
-                if (response.ok) {
-                    statusElement.innerHTML = `
-                        <div class="w-3 h-3 bg-green-400 rounded-full"></div>
-                        <span class="text-sm">서버 정상</span>
-                    `;
-                    responseTimeElement.textContent = `응답 시간: ${responseTime}ms`;
-                } else {
-                    statusElement.innerHTML = `
-                        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                        <span class="text-sm">서버 오류 (${response.status})</span>
-                    `;
-                    responseTimeElement.textContent = `응답 시간: ${responseTime}ms`;
-                }
-            } catch (error) {
-                statusElement.innerHTML = `
-                    <div class="w-3 h-3 bg-red-400 rounded-full"></div>
-                    <span class="text-sm">서버 연결 불가</span>
-                `;
-                responseTimeElement.textContent = '연결 실패';
-            }
-        }
-
-        // 페이지 로드 시 실행
-        document.addEventListener('DOMContentLoaded', function () {
-            renderProjects();
-            checkServerStatus();
-
-            // 30초마다 서버 상태 확인
-            setInterval(checkServerStatus, 30000);
-        });
-    </script>
-</body>
-
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
