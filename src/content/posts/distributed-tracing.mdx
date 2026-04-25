@@ -1,0 +1,84 @@
+---
+title: '브라우저는 3초, curl은 40ms였다.'
+slug: 'distributed-tracing'
+kicker: 'CASE No. 03'
+date: '2025-09-18'
+metric:
+  before: '쿼리 369ms'
+  after: '쿼리 16ms'
+  delta: '23× 개선 · 복합 인덱스 추가'
+related: ['hikaricp', 'mongo-migration']
+tags: ['OpenTelemetry', 'Tempo', 'MongoDB', '인덱스 튜닝']
+readingMinutes: 7
+---
+
+같은 요청이었다. 브라우저에선 **1.7~3.5초**. `curl` 로 같은 엔드포인트를 치면 **38~58ms**.
+이 모순을 가설로 덮는 게 제일 쉽다. "브라우저 렌더링 이슈" · "네트워크 스로틀링" · "CDN 오버헤드" ...
+하지만 이 종류의 가설은 **거의 맞지 않는다**. 내 경험상 가설 4~5개 중 원인은 없고, 시간만 하루 날아간다.
+
+## 트레이스로 분해했다
+
+OpenTelemetry + Tempo 로 요청 한 건을 끝까지 펼쳐봤다.
+
+```
+request /chat/history/:threadId       total = 1,723ms
+├─ auth.verify                           12ms
+├─ connection.acquire                 1,680ms  ← !
+├─ db.query (MongoDB)                    12ms
+├─ response.serialize                     6ms
+└─ ...
+```
+
+눈에 들어온 건 `connection.acquire` 이 **1,680ms** 를 차지하는데, 정작 `db.query` 는 **12ms** 밖에 안 된다는 모순.
+`curl` 은 keep-alive 로 이미 연결이 살아 있기 때문에 `connection.acquire` 가 0에 가깝다 — 그래서 40ms.
+브라우저는 매 페이지 이동마다 새 연결을 맺는데, 그 **connect 시간만 1.7초 걸리고 있었다**.
+
+## 왜 connect 가 느린가
+
+MongoDB 드라이버 레벨의 connection pool 을 들여다봤다. 풀은 충분히 살아 있었다.
+그렇다면 연결을 얻어오는 로직 자체가 아니라, **풀이 비어서 새로 맺느라 걸리는 시간**이 문제.
+
+- 쿼리 한 건이 끝나면 연결 반납
+- 다음 쿼리가 들어오기 전에 **유휴 연결이 `idleTimeout` 에 걸려 끊어짐**
+- 새 쿼리가 오면 **새 TCP + TLS 핸드셰이크** → 1.6초
+
+그런데 이건 진짜 원인이 아니었다. **왜 1초 이상 유휴 연결이 생겼는지**가 근본 원인.
+트레이스를 더 올려봤다.
+
+## 진짜 원인은 인덱스였다
+
+```
+db.messages.find({ meetingId: X, createdAt: { $gte: Y } }).sort({ createdAt: -1 })
+        → scanned: 1,820,445 docs
+        → returned: 32 docs
+        → time: 369ms
+```
+
+`meetingId` 필터는 있었지만, 거기에 붙은 `createdAt` 정렬이 **기존 인덱스를 탈 수 없는 형태**.
+전체 컬렉션을 도는 쿼리가 100~300ms 씩 걸리면서, 평균적으로 풀 안의 연결이 오래 블로킹되고,
+블로킹 사이 다른 쿼리들의 연결도 큐에 쌓이면서 **connection acquire 지연까지 유발**했다.
+
+진짜 타깃은 복합 인덱스.
+
+```js
+db.messages.createIndex({ meetingId: 1, createdAt: -1 })
+```
+
+## 결과
+
+```
+db.messages.find({ meetingId: X, createdAt: { $gte: Y } }).sort({ createdAt: -1 })
+        → scanned: 32 docs     (-99.998%)
+        → returned: 32 docs
+        → time: 16ms            (23× faster)
+```
+
+- 쿼리: **369ms → 16ms** (**23×**)
+- connect 지연: 트레이스에서 사라짐. 풀이 비지 않으니 새 연결을 맺을 필요가 없음.
+- 체감 페이지 로딩: **1.7초 → 0.18초**.
+
+## 배운 것
+
+1. **모순된 측정치는 선물이다.** 브라우저 3초 vs curl 40ms 는 답을 숨기고 있는 게 아니라 손짓하고 있었다.
+2. **트레이스의 depth 를 끝까지 본다.** connection.acquire 가 느리다 → 드라이버 이슈가 아니라, **다른 쿼리가 풀을 붙잡고 있었다**.
+3. **증상과 원인은 3단계쯤 떨어져 있다.** "페이지 느림 → 연결 느림 → 쿼리 느림 → 인덱스 없음." 직관으로 3단계를 한 번에 건너뛰는 건 불가능하다.

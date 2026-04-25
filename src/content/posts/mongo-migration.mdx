@@ -1,0 +1,86 @@
+---
+title: '900만 건을, 12분에, 중단 없이.'
+slug: 'mongo-migration'
+kicker: 'CASE No. 02'
+date: '2025-10-24'
+metric:
+  before: 'PostgreSQL 단일 저장소'
+  after: 'MongoDB 마이그레이션 완료'
+  delta: '917,306건 · 정합성 100% · 다운타임 0분'
+related: ['hikaricp', 'distributed-tracing']
+tags: ['PostgreSQL', 'MongoDB', '마이그레이션', '듀얼라이트']
+readingMinutes: 8
+---
+
+"채팅 저장소를 PG에서 MongoDB로 옮긴다."
+한 줄짜리 티켓. 실제로는 **서비스를 한 번도 세우지 않고** 옮겨야 했다.
+
+## 컷오버는 스위치가 아니라 단계다
+
+"A 저장소를 끄고 B 저장소를 켠다" 는 식의 컷오버는 순간이동이 아니다.
+트래픽은 계속 들어오고, 인-플라이트 요청들은 중간 상태에 갇히고,
+두 저장소 어느 쪽이 진실인지 **프로덕션 중에 결정해야** 한다.
+
+3단계 듀얼라이트 전략을 설계했다.
+
+### 1단계 — 이중 쓰기 시작
+
+```ts
+const flag = process.env.CHAT_WRITE_MODE // 'pg' | 'pg+mongo' | 'mongo'
+
+async function saveMessage(msg: Message) {
+  if (flag === 'pg' || flag === 'pg+mongo') {
+    await pg.insert(msg)
+  }
+  if (flag === 'pg+mongo' || flag === 'mongo') {
+    await mongo.insert(msg) // fire-and-forget? no. 동기.
+  }
+}
+```
+
+- 읽기는 **여전히 PG** 에서만 한다.
+- 쓰기는 두 저장소에 동시에, 모두 성공해야 요청을 OK 응답 한다.
+- 한쪽 실패 시 롤백 경로: PG 우선, Mongo 실패는 dead-letter 큐로.
+
+신규 트래픽만 동기화되므로, 이 단계에서는 **역사 데이터가 아직 Mongo에 없다**.
+
+### 2단계 — 과거 데이터 배치 이관
+
+```bash
+# 청크 단위로 나눠 이관, 100만 건 × 10 배치
+$ ./migrate.sh --from=pg --to=mongo \
+    --chunk-size=100000 \
+    --verify=hash+count
+```
+
+- 각 배치 끝나면 **양쪽 카운트 + 샘플 해시** 비교. 하나라도 안 맞으면 배치 롤백.
+- 최종 총합: **900,385 건 이관 · 12분 소요 · 0 건 실패**.
+- Mongo 측 최종 집계: **917,306 건** (PG 기준 +36건은 시스템 메시지. 원본과 일치.)
+
+### 3단계 — 읽기 경로 전환
+
+```ts
+if (featureFlag.CHAT_READ_FROM_MONGO) {
+  return mongo.findByThread(id)
+}
+return pg.findByThread(id)
+```
+
+- 읽기 트래픽을 카나리로 전환 (1% → 10% → 50% → 100%).
+- PG 는 **관측용 섀도**로 남겨 1주일간 병렬 유지. 이상 탐지되면 다시 PG로 롤백.
+- 1주일 후 PG 테이블 드롭.
+
+## 0분의 비밀
+
+"다운타임 0분" 이란 숫자의 뒤에는 세 가지 방어선이 있었다.
+
+1. **역방향 롤백 경로**. 어느 단계든 다음 단계로 못 가면, 이전 단계로 무조건 돌아갈 수 있게 만들었다.
+2. **환경변수 토글**. 코드 배포 없이 단계 전환이 가능해야 한다. 롤백 속도 = 환경변수 재적용 속도.
+3. **검증 자동화**. 수동 eyeballing 은 피해갈 수 없다. `hash + count + sample query` 3종 세트가 각 배치에서 자동 실행.
+
+## 숫자가 중요한 이유
+
+마이그레이션 계획서에 "무중단으로 진행한다"라고 쓰는 건 쉽다.
+**원본 900,385 건, 이관 후 Mongo 917,306 건, 차이 36 건 (시스템 메시지 설명 가능)** 이라고 쓰면 이야기가 달라진다.
+
+숫자가 있으면 사후 질문이 줄어든다. 숫자가 없으면 한 달 뒤에도 "근데 진짜 다 옮겨진 거 맞아?" 라는 질문이 돌아온다.
