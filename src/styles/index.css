@@ -16,6 +16,15 @@
   --page-rule: #e4e4e4;
 }
 
+.theme-journal {
+  --page-bg: #fdfcf9;
+  --page-fg: #1a1a1a;
+  --page-muted: #5a5a55;
+  --page-rule: #e7e3d8;
+  --journal-accent: #7a3220;
+  --journal-quote: #4a4540;
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -151,4 +160,181 @@
 }
 .prose-gallery th {
   @apply font-mono text-[0.7rem] uppercase tracking-[0.25em] text-ghost;
+}
+
+/* ───────────── Reading-first Journal (used by /blog) ───────────── */
+
+.prose-journal {
+  font-family: 'Noto Serif KR', Georgia, serif;
+  color: var(--page-fg);
+  font-size: 19px;
+  line-height: 1.85;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.prose-journal > * + * {
+  margin-top: 1.5rem;
+}
+.prose-journal h2 {
+  font-family: 'Noto Serif KR', Georgia, serif;
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-top: 4rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.prose-journal h3 {
+  font-family: 'Noto Serif KR', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 2.5rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.35;
+}
+.prose-journal h2 a,
+.prose-journal h3 a,
+.prose-journal h4 a {
+  color: inherit;
+  text-decoration: none;
+}
+.prose-journal p {
+  margin-top: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.prose-journal p a,
+.prose-journal li a {
+  color: var(--journal-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: text-decoration-thickness 150ms ease;
+}
+.prose-journal p a:hover,
+.prose-journal li a:hover {
+  text-decoration-thickness: 2px;
+}
+.prose-journal strong {
+  font-weight: 700;
+  color: var(--page-fg);
+}
+.prose-journal em {
+  font-style: italic;
+  color: var(--journal-quote);
+}
+.prose-journal blockquote {
+  margin: 2rem 0;
+  padding: 0 0 0 1.5rem;
+  border-left: 2px solid var(--journal-accent);
+  font-style: italic;
+  color: var(--journal-quote);
+  font-size: 1.05em;
+  line-height: 1.75;
+}
+.prose-journal blockquote p {
+  margin: 0.5rem 0;
+}
+.prose-journal ul,
+.prose-journal ol {
+  margin: 1.5rem 0;
+  padding-left: 0;
+  list-style: none;
+}
+.prose-journal ul li,
+.prose-journal ol li {
+  position: relative;
+  padding-left: 1.6rem;
+  margin: 0.5rem 0;
+  display: block;
+}
+.prose-journal ul li::before {
+  content: '·';
+  position: absolute;
+  left: 0.4rem;
+  top: 0;
+  color: var(--journal-accent);
+  font-weight: 700;
+  line-height: inherit;
+}
+.prose-journal ol {
+  counter-reset: jl;
+}
+.prose-journal ol li {
+  padding-left: 2rem;
+}
+.prose-journal ol li::before {
+  content: counter(jl);
+  counter-increment: jl;
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.78em;
+  color: var(--journal-accent);
+  letter-spacing: 0;
+  line-height: 1;
+}
+.prose-journal code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  background: #f1ede4;
+  padding: 0.1em 0.45em;
+  border-radius: 2px;
+  font-size: 0.88em;
+  letter-spacing: -0.01em;
+}
+.prose-journal pre {
+  margin: 2rem 0;
+  padding: 1.4rem 1.5rem;
+  background: #f6f2e8;
+  border-radius: 2px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: #2a2823;
+}
+.prose-journal pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+.prose-journal table {
+  margin: 2rem 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+.prose-journal th,
+.prose-journal td {
+  border-bottom: 1px solid var(--page-rule);
+  padding: 0.85rem 1rem 0.85rem 0;
+  text-align: left;
+}
+.prose-journal th {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--page-muted);
+  font-weight: 500;
+}
+.prose-journal hr {
+  margin: 3rem auto;
+  width: 6rem;
+  border: 0;
+  border-top: 1px solid var(--page-rule);
+}
+
+.prose-journal > p:first-of-type::first-letter {
+  font-size: 3.4rem;
+  line-height: 0.9;
+  font-weight: 700;
+  float: left;
+  margin: 0.35rem 0.55rem 0 0;
+  color: var(--page-fg);
 }
