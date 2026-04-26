@@ -27,7 +27,7 @@ export const hub = {
       slug: '/blog',
       title: '쓴 글',
       sub: '기술·회고·메모',
-      status: 'SOON',
+      status: 'LIVE',
     },
     {
       id: 'lab',

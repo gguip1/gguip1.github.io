@@ -1,13 +1,13 @@
 ---
 title: '브라우저는 3초, curl은 40ms였다.'
-slug: 'distributed-tracing'
+slug: '3'
 kicker: 'CASE No. 03'
 date: '2025-09-18'
 metric:
-  before: '쿼리 369ms'
-  after: '쿼리 16ms'
-  delta: '23× 개선 · 복합 인덱스 추가'
-related: ['hikaricp', 'mongo-migration']
+  before: '쿼리 369ms · scan 1.8M'
+  after: '쿼리 16ms · scan 32'
+  delta: '23× 개선 · 복합 인덱스 적중'
+related: ['1', '2']
 tags: ['OpenTelemetry', 'Tempo', 'MongoDB', '인덱스 튜닝']
 readingMinutes: 7
 ---
@@ -35,17 +35,14 @@ request /chat/history/:threadId       total = 1,723ms
 
 ## 왜 connect 가 느린가
 
-MongoDB 드라이버 레벨의 connection pool 을 들여다봤다. 풀은 충분히 살아 있었다.
-그렇다면 연결을 얻어오는 로직 자체가 아니라, **풀이 비어서 새로 맺느라 걸리는 시간**이 문제.
+여기서 함정 한 겹이 더 있었다. 겉보기에는 "연결을 새로 맺는 데 오래 걸린다" 로 읽히지만, 풀 자체는 살아 있었다.
+진짜 문제는 **풀 안의 연결이 오래 점유되어서, 새로 요청이 들어왔을 때 가용 커넥션이 없었다**는 쪽이었다.
 
-- 쿼리 한 건이 끝나면 연결 반납
-- 다음 쿼리가 들어오기 전에 **유휴 연결이 `idleTimeout` 에 걸려 끊어짐**
-- 새 쿼리가 오면 **새 TCP + TLS 핸드셰이크** → 1.6초
-
-그런데 이건 진짜 원인이 아니었다. **왜 1초 이상 유휴 연결이 생겼는지**가 근본 원인.
-트레이스를 더 올려봤다.
+질문은 한 단계 더 올라간다. **왜 기존 커넥션이 오래 점유되고 있었나?**
 
 ## 진짜 원인은 인덱스였다
+
+실행 계획을 들여다봤다.
 
 ```
 db.messages.find({ meetingId: X, createdAt: { $gte: Y } }).sort({ createdAt: -1 })
@@ -54,11 +51,10 @@ db.messages.find({ meetingId: X, createdAt: { $gte: Y } }).sort({ createdAt: -1 
         → time: 369ms
 ```
 
-`meetingId` 필터는 있었지만, 거기에 붙은 `createdAt` 정렬이 **기존 인덱스를 탈 수 없는 형태**.
-전체 컬렉션을 도는 쿼리가 100~300ms 씩 걸리면서, 평균적으로 풀 안의 연결이 오래 블로킹되고,
-블로킹 사이 다른 쿼리들의 연결도 큐에 쌓이면서 **connection acquire 지연까지 유발**했다.
+`meetingId` 필터는 있었지만, 거기에 붙은 `createdAt` 정렬이 **기존 인덱스를 탈 수 없는 형태**였다.
+컬렉션을 거의 전수 스캔하는 쿼리가 평균 수백 ms 씩 커넥션을 점유하면서, 뒤따라 들어온 요청들의 `connection.acquire` 까지 지연시키고 있었다.
 
-진짜 타깃은 복합 인덱스.
+타깃은 복합 인덱스.
 
 ```js
 db.messages.createIndex({ meetingId: 1, createdAt: -1 })
@@ -79,6 +75,6 @@ db.messages.find({ meetingId: X, createdAt: { $gte: Y } }).sort({ createdAt: -1 
 
 ## 배운 것
 
-1. **모순된 측정치는 선물이다.** 브라우저 3초 vs curl 40ms 는 답을 숨기고 있는 게 아니라 손짓하고 있었다.
-2. **트레이스의 depth 를 끝까지 본다.** connection.acquire 가 느리다 → 드라이버 이슈가 아니라, **다른 쿼리가 풀을 붙잡고 있었다**.
-3. **증상과 원인은 3단계쯤 떨어져 있다.** "페이지 느림 → 연결 느림 → 쿼리 느림 → 인덱스 없음." 직관으로 3단계를 한 번에 건너뛰는 건 불가능하다.
+1. **모순된 측정치는 선물이다.** 브라우저 3 초 vs curl 40 ms 는 답을 숨기고 있는 게 아니라 손짓하고 있었다.
+2. **트레이스의 depth 를 끝까지 본다.** `connection.acquire` 가 느리다는 사실이 드라이버 문제가 아니라, **다른 쿼리가 풀을 점유하고 있었다**는 단서였다.
+3. **증상과 원인은 여러 단계 떨어져 있다.** "페이지 느림 → 연결 획득 느림 → 쿼리 느림 → 인덱스 없음." 직관으로 이 단계들을 한 번에 건너뛰는 건 불가능하다.

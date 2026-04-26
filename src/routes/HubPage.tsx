@@ -1,7 +1,12 @@
+import { useEffect } from 'react'
 import { hub } from '@/content/hub'
 import HubRow from '@/components/hub/HubRow'
 
 export default function HubPage() {
+  useEffect(() => {
+    document.title = 'gguip1 · 이기용'
+  }, [])
+
   return (
     <main className="theme-white min-h-screen bg-white text-ink">
       <div className="mx-auto flex min-h-screen max-w-[960px] flex-col px-6 py-10 md:px-10 md:py-16">

@@ -26,7 +26,7 @@ export default function SignatureStoriesSection({ stories }: Props) {
               className="group relative"
             >
               <Link
-                to={`/me/stories/${story.id}`}
+                to={`/blog/${story.id}`}
                 className="block rounded-sm border border-rule-soft bg-mist-cool p-8 transition-all duration-300 hover:border-ink hover:bg-paper md:p-12"
               >
                 <div className="flex items-start justify-between gap-6 md:items-baseline">
