@@ -1,6 +1,8 @@
 import { ArrowLeft, ArrowUpRight, CalendarDays } from "lucide-react";
-import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type WorkType = "project" | "post" | "experiment" | "note";
 type WorkStatus = "draft" | "public" | "archived";
@@ -394,7 +396,7 @@ function DetailPage({
           <div className="site-shell detail-layout">
             <article className="article-body" aria-label="본문">
               {detailError ? <p className="state-message">{detailError}</p> : null}
-              {body ? renderMarkdown(body) : null}
+              {body ? <MarkdownBody content={body} /> : null}
               {detail && !body && !detailError ? (
                 <p className="state-message">아직 본문이 없습니다.</p>
               ) : null}
@@ -406,217 +408,32 @@ function DetailPage({
   );
 }
 
-function renderMarkdown(content: string) {
-  const lines = content.split(/\r?\n/);
-  const elements: JSX.Element[] = [];
-  let paragraph: string[] = [];
-  let list: { type: "ul" | "ol"; items: string[] } | null = null;
-  let quote: string[] = [];
-  let code: string[] | null = null;
-  let codeLanguage = "";
+const markdownComponents: Components = {
+  a({ children, href }) {
+    const external = Boolean(href && /^https?:\/\//.test(href));
 
-  function key() {
-    return `block-${elements.length}`;
-  }
-
-  function flushParagraph() {
-    if (paragraph.length === 0) {
-      return;
-    }
-
-    elements.push(<p key={key()}>{renderInline(paragraph.join(" "))}</p>);
-    paragraph = [];
-  }
-
-  function flushList() {
-    if (!list || list.items.length === 0) {
-      return;
-    }
-
-    const ListTag = list.type;
-
-    elements.push(
-      <ListTag key={key()}>
-        {list.items.map((item, index) => (
-          <li key={`${item}-${index}`}>{renderInline(item)}</li>
-        ))}
-      </ListTag>,
+    return (
+      <a href={href ? resolvePublicPath(href) : undefined} rel={external ? "noopener noreferrer" : undefined} target={external ? "_blank" : undefined}>
+        {children}
+      </a>
     );
-    list = null;
-  }
-
-  function flushQuote() {
-    if (quote.length === 0) {
-      return;
-    }
-
-    elements.push(<blockquote key={key()}>{renderInline(quote.join(" "))}</blockquote>);
-    quote = [];
-  }
-
-  function flushTextBlocks() {
-    flushParagraph();
-    flushList();
-    flushQuote();
-  }
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    if (trimmed.startsWith("```")) {
-      if (code) {
-        elements.push(
-          <pre key={key()}>
-            <code data-language={codeLanguage}>{code.join("\n")}</code>
-          </pre>,
-        );
-        code = null;
-        codeLanguage = "";
-        continue;
-      }
-
-      flushTextBlocks();
-      code = [];
-      codeLanguage = trimmed.replace("```", "").trim();
-      continue;
-    }
-
-    if (code) {
-      code.push(line);
-      continue;
-    }
-
-    if (!trimmed) {
-      flushTextBlocks();
-      continue;
-    }
-
-    const heading = trimmed.match(/^(#{2,4})\s+(.+)$/);
-
-    if (heading) {
-      flushTextBlocks();
-      const level = heading[1].length;
-      const text = heading[2];
-
-      if (level === 2) {
-        elements.push(<h2 key={key()}>{renderInline(text)}</h2>);
-      } else if (level === 3) {
-        elements.push(<h3 key={key()}>{renderInline(text)}</h3>);
-      } else {
-        elements.push(<h4 key={key()}>{renderInline(text)}</h4>);
-      }
-      continue;
-    }
-
-    const image = trimmed.match(/^!\[(.*)]\((.+)\)$/);
-
-    if (image) {
-      flushTextBlocks();
-      const caption = image[1];
-      const source = image[2];
-
-      elements.push(
-        <figure className="article-image" key={key()}>
-          <img alt={caption} loading="lazy" src={resolvePublicPath(source)} />
-          {caption && caption !== "image" ? <figcaption>{caption}</figcaption> : null}
-        </figure>,
-      );
-      continue;
-    }
-
-    if (trimmed.startsWith("- ")) {
-      flushParagraph();
-      flushQuote();
-      if (!list || list.type !== "ul") {
-        flushList();
-        list = { type: "ul", items: [] };
-      }
-      list.items.push(trimmed.slice(2));
-      continue;
-    }
-
-    const ordered = trimmed.match(/^\d+\.\s+(.+)$/);
-
-    if (ordered) {
-      flushParagraph();
-      flushQuote();
-      if (!list || list.type !== "ol") {
-        flushList();
-        list = { type: "ol", items: [] };
-      }
-      list.items.push(ordered[1]);
-      continue;
-    }
-
-    if (trimmed.startsWith("> ")) {
-      flushParagraph();
-      flushList();
-      quote.push(trimmed.slice(2));
-      continue;
-    }
-
-    flushList();
-    flushQuote();
-    paragraph.push(trimmed);
-  }
-
-  if (code) {
-    elements.push(
-      <pre key={key()}>
-        <code data-language={codeLanguage}>{code.join("\n")}</code>
-      </pre>,
+  },
+  img({ alt, src }) {
+    return <img alt={alt ?? ""} loading="lazy" src={src ? resolvePublicPath(src) : undefined} />;
+  },
+  table({ children }) {
+    return (
+      <div className="article-table">
+        <table>{children}</table>
+      </div>
     );
-  }
+  },
+};
 
-  flushTextBlocks();
-
-  return elements;
-}
-
-function renderInline(text: string) {
-  const nodes: ReactNode[] = [];
-  const pattern = /(\[[^\]]+]\([^)]+\)|`[^`]+`|\*\*[^*]+\*\*|~~[^~]+~~|\*[^*]+\*)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = pattern.exec(text))) {
-    if (match.index > lastIndex) {
-      nodes.push(text.slice(lastIndex, match.index));
-    }
-
-    const token = match[0];
-
-    if (token.startsWith("[") && token.includes("](")) {
-      const link = token.match(/^\[([^\]]+)]\(([^)]+)\)$/);
-
-      if (link) {
-        const href = link[2];
-        const external = /^https?:\/\//.test(href);
-
-        nodes.push(
-          <a href={resolvePublicPath(href)} key={`${token}-${match.index}`} rel={external ? "noreferrer" : undefined} target={external ? "_blank" : undefined}>
-            {link[1]}
-          </a>,
-        );
-      } else {
-        nodes.push(token);
-      }
-    } else if (token.startsWith("`")) {
-      nodes.push(<code key={`${token}-${match.index}`}>{token.slice(1, -1)}</code>);
-    } else if (token.startsWith("**")) {
-      nodes.push(<strong key={`${token}-${match.index}`}>{token.slice(2, -2)}</strong>);
-    } else if (token.startsWith("~~")) {
-      nodes.push(<del key={`${token}-${match.index}`}>{token.slice(2, -2)}</del>);
-    } else if (token.startsWith("*")) {
-      nodes.push(<em key={`${token}-${match.index}`}>{token.slice(1, -1)}</em>);
-    }
-
-    lastIndex = pattern.lastIndex;
-  }
-
-  if (lastIndex < text.length) {
-    nodes.push(text.slice(lastIndex));
-  }
-
-  return nodes;
+function MarkdownBody({ content }: { content: string }) {
+  return (
+    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+      {content}
+    </ReactMarkdown>
+  );
 }

@@ -597,6 +597,11 @@ button {
   margin-top: 6px;
 }
 
+.article-body input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--name-accent);
+}
+
 .article-body a {
   color: #2f6ed3;
   text-decoration: underline;
@@ -618,7 +623,21 @@ button {
   margin: 28px 0 0;
 }
 
+.article-body p:has(> img:only-child) {
+  margin: 28px 0 0;
+}
+
 .article-image img {
+  display: block;
+  width: 100%;
+  max-height: 620px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  object-fit: contain;
+  background: var(--surface-soft);
+}
+
+.article-body p > img:only-child {
   display: block;
   width: 100%;
   max-height: 620px;
@@ -635,6 +654,37 @@ button {
   line-height: 1.5;
 }
 
+.article-table {
+  margin: 28px 0 0;
+  overflow-x: auto;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+}
+
+.article-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.article-table th,
+.article-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--hairline);
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-table th {
+  color: var(--ink);
+  background: var(--surface-soft);
+  font-weight: 650;
+}
+
+.article-table tr:last-child td {
+  border-bottom: 0;
+}
+
 .article-body blockquote {
   margin: 24px 0 0;
   padding: 14px 18px;
@@ -642,6 +692,10 @@ button {
   border-radius: 0 8px 8px 0;
   color: var(--charcoal);
   background: var(--surface-soft);
+}
+
+.article-body blockquote > p {
+  margin: 0;
 }
 
 .article-body pre {
