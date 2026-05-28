@@ -372,6 +372,18 @@ button {
   background: #fff7f5;
 }
 
+.empty-message {
+  margin: 0;
+  padding: 42px 18px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  color: var(--slate);
+  background: var(--surface-soft);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
 .skeleton-card {
   min-height: 326px;
   border: 1px solid var(--hairline);

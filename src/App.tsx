@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 
 type WorkType = "project" | "post" | "experiment" | "note";
 type WorkStatus = "draft" | "public" | "archived";
-type TabKey = "all" | WorkType;
+type TabKey = "all" | "project";
 
 type WorkItem = {
   id: string;
@@ -61,9 +61,6 @@ type WorkDetail = WorkItem & {
 const tabs: Array<{ key: TabKey; label: string }> = [
   { key: "all", label: "전체" },
   { key: "project", label: "프로젝트" },
-  { key: "post", label: "글" },
-  { key: "experiment", label: "실험" },
-  { key: "note", label: "노트" },
 ];
 
 const typeLabel: Record<WorkType, string> = {
@@ -327,6 +324,10 @@ function App() {
                     </article>
                   ))}
                 </div>
+              ) : null}
+
+              {content && items.length === 0 ? (
+                <p className="empty-message">아직 공개된 항목이 없습니다.</p>
               ) : null}
             </div>
           </div>
