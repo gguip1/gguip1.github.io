@@ -222,13 +222,15 @@ function App() {
       .sort((a, b) => a.order - b.order);
   }, [activeTab, content]);
 
+  const isContentLoading = !content && !error;
+
   if (selectedSlug) {
     return (
       <DetailPage
         detail={detail}
         detailError={detailError}
         fallbackItem={selectedItem}
-        isContentLoading={!content && !error}
+        isContentLoading={isContentLoading}
       />
     );
   }
@@ -359,12 +361,6 @@ function DetailPage({
         </div>
       </nav>
 
-      {isContentLoading ? (
-        <div className="site-shell">
-          <div className="detail-loading" />
-        </div>
-      ) : null}
-
       {!item && !isContentLoading ? (
         <div className="site-shell">
           <p className="state-message">항목을 찾지 못했습니다.</p>
@@ -396,23 +392,6 @@ function DetailPage({
           </header>
 
           <div className="site-shell detail-layout">
-            <aside className="detail-aside" aria-label="문서 정보">
-              <dl>
-                <div>
-                  <dt>상태</dt>
-                  <dd>{statusLabel[item.status]}</dd>
-                </div>
-                <div>
-                  <dt>분류</dt>
-                  <dd>{typeLabel[item.type]}</dd>
-                </div>
-                <div>
-                  <dt>날짜</dt>
-                  <dd>{formatItemDate(item)}</dd>
-                </div>
-              </dl>
-            </aside>
-
             <article className="article-body" aria-label="본문">
               {detailError ? <p className="state-message">{detailError}</p> : null}
               {body ? renderMarkdown(body) : null}
