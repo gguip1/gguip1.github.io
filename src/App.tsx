@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpRight, CalendarDays } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CalendarDays, Github, Mail } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
@@ -402,6 +402,7 @@ function App() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }
@@ -423,58 +424,84 @@ function DetailPage({
   const body = detail?.body?.content?.trim() ?? "";
 
   return (
-    <main className="detail-page">
-      <nav className="detail-nav" aria-label="상세 페이지 이동">
-        <div className="site-shell">
-          <a className="back-link" href="#archive">
-            <ArrowLeft size={17} aria-hidden="true" />
-            목록
-          </a>
-        </div>
-      </nav>
-
-      {!item && !isContentLoading ? (
-        <div className="site-shell">
-          <p className="state-message">항목을 찾지 못했습니다.</p>
-        </div>
-      ) : null}
-
-      {item ? (
-        <>
-          <header className="detail-hero">
-            {item.visual.cover ? (
-              <img className="detail-hero-bg" alt="" src={resolvePublicPath(item.visual.cover)} />
-            ) : null}
-            <div className="site-shell detail-hero-inner">
-              <div className="detail-meta">
-                <span>{typeLabel[item.type]}</span>
-                <span>
-                  <CalendarDays size={15} aria-hidden="true" />
-                  {formatItemDate(item)}
-                </span>
-              </div>
-              <h1>{item.title}</h1>
-              <p>{item.summary}</p>
-              <div className="detail-tags" aria-label="태그">
-                {item.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-            </div>
-          </header>
-
-          <div className="site-shell detail-layout">
-            <article className="article-body" aria-label="본문">
-              {detailError ? <p className="state-message">{detailError}</p> : null}
-              {body ? <MarkdownBody content={body} /> : null}
-              {detail && !body && !detailError ? (
-                <p className="state-message">아직 본문이 없습니다.</p>
-              ) : null}
-            </article>
+    <>
+      <main className="detail-page">
+        <nav className="detail-nav" aria-label="상세 페이지 이동">
+          <div className="site-shell">
+            <a className="back-link" href="#archive">
+              <ArrowLeft size={17} aria-hidden="true" />
+              목록
+            </a>
           </div>
-        </>
-      ) : null}
-    </main>
+        </nav>
+
+        {!item && !isContentLoading ? (
+          <div className="site-shell">
+            <p className="state-message">항목을 찾지 못했습니다.</p>
+          </div>
+        ) : null}
+
+        {item ? (
+          <>
+            <header className="detail-hero">
+              {item.visual.cover ? (
+                <img className="detail-hero-bg" alt="" src={resolvePublicPath(item.visual.cover)} />
+              ) : null}
+              <div className="site-shell detail-hero-inner">
+                <div className="detail-meta">
+                  <span>{typeLabel[item.type]}</span>
+                  <span>
+                    <CalendarDays size={15} aria-hidden="true" />
+                    {formatItemDate(item)}
+                  </span>
+                </div>
+                <h1>{item.title}</h1>
+                <p>{item.summary}</p>
+                <div className="detail-tags" aria-label="태그">
+                  {item.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </header>
+
+            <div className="site-shell detail-layout">
+              <article className="article-body" aria-label="본문">
+                {detailError ? <p className="state-message">{detailError}</p> : null}
+                {body ? <MarkdownBody content={body} /> : null}
+                {detail && !body && !detailError ? (
+                  <p className="state-message">아직 본문이 없습니다.</p>
+                ) : null}
+              </article>
+            </div>
+          </>
+        ) : null}
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <div className="site-shell footer-inner">
+        <div className="footer-brand">
+          <strong>gguip1.archive</strong>
+          <p>궁금한 것을 만들며 배우는 개발자 이기용</p>
+        </div>
+        <nav className="footer-links" aria-label="Footer links">
+          <a href="mailto:gguip.dev@gmail.com">
+            <Mail size={15} aria-hidden="true" />
+            Email
+          </a>
+          <a href="https://github.com/gguip1" rel="noopener noreferrer" target="_blank">
+            <Github size={15} aria-hidden="true" />
+            GitHub
+          </a>
+        </nav>
+      </div>
+    </footer>
   );
 }
 
