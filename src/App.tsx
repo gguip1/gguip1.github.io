@@ -76,6 +76,56 @@ const statusLabel: Record<WorkStatus, string> = {
   archived: "보관",
 };
 
+const siteUrl = "https://gguip1.github.io/";
+const siteTitle = "gguip1.archive | 이기용 개발 아카이브";
+const siteDescription = "궁금한 것을 만들며 배우는 개발자 이기용의 프로젝트와 글을 모아 둔 개인 아카이브입니다.";
+
+function setMetaAttribute(attributeName: "name" | "property", attributeValue: string, content: string) {
+  let element = document.head.querySelector<HTMLMetaElement>(`meta[${attributeName}="${attributeValue}"]`);
+
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute(attributeName, attributeValue);
+    document.head.appendChild(element);
+  }
+
+  element.setAttribute("content", content);
+}
+
+function setCanonicalUrl(url: string) {
+  let element = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+
+  if (!element) {
+    element = document.createElement("link");
+    element.setAttribute("rel", "canonical");
+    document.head.appendChild(element);
+  }
+
+  element.setAttribute("href", url);
+}
+
+function updatePageSeo({
+  title,
+  description,
+  url = siteUrl,
+  type = "website",
+}: {
+  title: string;
+  description: string;
+  url?: string;
+  type?: "website" | "article";
+}) {
+  document.title = title;
+  setCanonicalUrl(siteUrl);
+  setMetaAttribute("name", "description", description);
+  setMetaAttribute("property", "og:type", type);
+  setMetaAttribute("property", "og:url", url);
+  setMetaAttribute("property", "og:title", title);
+  setMetaAttribute("property", "og:description", description);
+  setMetaAttribute("name", "twitter:title", title);
+  setMetaAttribute("name", "twitter:description", description);
+}
+
 function getSelectedSlug() {
   const match = window.location.hash.match(/^#\/items\/([^/?#]+)/);
 
@@ -212,6 +262,25 @@ function App() {
 
     return () => controller.abort();
   }, [selectedItem]);
+
+  useEffect(() => {
+    const metaItem = detail ?? selectedItem;
+
+    if (!selectedSlug || !metaItem) {
+      updatePageSeo({
+        title: siteTitle,
+        description: siteDescription,
+      });
+      return;
+    }
+
+    updatePageSeo({
+      title: `${metaItem.title} | gguip1.archive`,
+      description: metaItem.summary || siteDescription,
+      url: `${siteUrl}#/items/${encodeURIComponent(metaItem.slug)}`,
+      type: "article",
+    });
+  }, [detail, selectedItem, selectedSlug]);
 
   const items = useMemo(() => {
     const source = content?.items ?? [];
