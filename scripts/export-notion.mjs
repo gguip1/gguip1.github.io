@@ -615,38 +615,79 @@ function richTextToMarkdown(items) {
   }
 
   return items
-    .map((item) => {
-      let text = item.plain_text ?? "";
-
-      if (!text) {
-        return "";
-      }
-
-      if (item.annotations?.code) {
-        text = `\`${text.replace(/`/g, "\\`")}\``;
-      } else {
-        if (item.annotations?.bold) {
-          text = `**${text}**`;
-        }
-
-        if (item.annotations?.italic) {
-          text = `*${text}*`;
-        }
-
-        if (item.annotations?.strikethrough) {
-          text = `~~${text}~~`;
-        }
-      }
-
-      const href = item.href ?? item.text?.link?.url;
-
-      if (href) {
-        return markdownLink(href, text);
-      }
-
-      return text;
-    })
+    .map((item) => richTextItemToMarkdown(item))
     .join("");
+}
+
+function richTextItemToMarkdown(item) {
+  const text = item.plain_text ?? "";
+
+  if (!text) {
+    return "";
+  }
+
+  const { leading, core, trailing } = splitHorizontalWhitespace(text);
+
+  if (!core) {
+    return preserveSoftBreaks(text);
+  }
+
+  let formattedText;
+
+  if (item.annotations?.code) {
+    formattedText = markdownCodeSpan(core);
+  } else {
+    formattedText = escapeMarkdownText(preserveSoftBreaks(core));
+
+    if (item.annotations?.bold) {
+      formattedText = `**${formattedText}**`;
+    }
+
+    if (item.annotations?.italic) {
+      formattedText = `*${formattedText}*`;
+    }
+
+    if (item.annotations?.strikethrough) {
+      formattedText = `~~${formattedText}~~`;
+    }
+  }
+
+  const href = item.href ?? item.text?.link?.url;
+  const result = `${leading}${formattedText}${trailing}`;
+
+  if (href) {
+    return markdownLink(href, result);
+  }
+
+  return result;
+}
+
+function splitHorizontalWhitespace(value) {
+  const match = String(value).match(/^([ \t]*)([\s\S]*?)([ \t]*)$/);
+
+  return {
+    leading: match?.[1] ?? "",
+    core: match?.[2] ?? "",
+    trailing: match?.[3] ?? "",
+  };
+}
+
+function preserveSoftBreaks(value) {
+  return String(value).replace(/[ \t]*\n/g, "  \n");
+}
+
+function markdownCodeSpan(value) {
+  const text = preserveSoftBreaks(value).replace(/\s*\n\s*/g, " ");
+  const longestBacktickRun = Math.max(0, ...Array.from(text.matchAll(/`+/g), (match) => match[0].length));
+  const delimiter = "`".repeat(longestBacktickRun + 1);
+  const needsPadding = text.startsWith("`") || text.endsWith("`");
+  const padding = needsPadding ? " " : "";
+
+  return `${delimiter}${padding}${text}${padding}${delimiter}`;
+}
+
+function escapeMarkdownText(value) {
+  return String(value).replace(/[\\`*_{}[\]()#+\-.!|<>]/g, "\\$&");
 }
 
 function normalizeMarkdown(content) {
