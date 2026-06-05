@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowUpRight, CalendarDays, Github, Mail } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowUpRight, CalendarDays, FileText, Github, Globe2, Mail, PlayCircle } from "lucide-react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -27,8 +27,10 @@ type WorkItem = {
   order: number;
   detailPath: string;
   links?: {
+    live?: string;
     demo?: string;
     repo?: string;
+    docs?: string;
     notion?: string;
   };
   visual: {
@@ -75,6 +77,19 @@ const statusLabel: Record<WorkStatus, string> = {
   public: "공개",
   archived: "보관",
 };
+
+type WorkLinkKey = "live" | "repo" | "demo" | "docs";
+
+const workLinkDefinitions: Array<{
+  key: WorkLinkKey;
+  label: string;
+  icon: typeof Globe2;
+}> = [
+  { key: "live", label: "Live", icon: Globe2 },
+  { key: "repo", label: "GitHub", icon: Github },
+  { key: "demo", label: "Demo", icon: PlayCircle },
+  { key: "docs", label: "문서", icon: FileText },
+];
 
 const siteUrl = "https://gguip1.github.io/";
 const siteTitle = "gguip1.archive | 이기용 개발 아카이브";
@@ -132,6 +147,15 @@ function getSelectedSlug() {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function jumpToDocumentPosition(top: number) {
+  const root = document.documentElement;
+  const previousScrollBehavior = root.style.scrollBehavior;
+
+  root.style.scrollBehavior = "auto";
+  window.scrollTo(0, top);
+  root.style.scrollBehavior = previousScrollBehavior;
+}
+
 function resolvePublicPath(value?: string) {
   if (!value) {
     return "";
@@ -142,6 +166,19 @@ function resolvePublicPath(value?: string) {
   }
 
   return `${import.meta.env.BASE_URL}${value.replace(/^\/+/, "")}`;
+}
+
+function visibleWorkLinks(links?: WorkItem["links"]) {
+  if (!links) {
+    return [];
+  }
+
+  return workLinkDefinitions
+    .map((definition) => ({
+      ...definition,
+      href: links[definition.key],
+    }))
+    .filter((link): link is (typeof workLinkDefinitions)[number] & { href: string } => Boolean(link.href));
 }
 
 function formatDate(value: string) {
@@ -182,6 +219,20 @@ function App() {
 
     return () => window.removeEventListener("hashchange", syncRoute);
   }, []);
+
+  useLayoutEffect(() => {
+    if (selectedSlug) {
+      jumpToDocumentPosition(0);
+      return;
+    }
+
+    if (window.location.hash === "#archive") {
+      jumpToDocumentPosition(document.getElementById("archive")?.offsetTop ?? 0);
+      return;
+    }
+
+    jumpToDocumentPosition(0);
+  }, [selectedSlug]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -355,7 +406,11 @@ function App() {
                 <div className="grid">
                   {items.map((item) => (
                     <article className="work-card" key={item.id}>
-                      <a href={`#/items/${encodeURIComponent(item.slug)}`} aria-label={`${item.title} 열기`}>
+                      <a
+                        className="card-main-link"
+                        href={`#/items/${encodeURIComponent(item.slug)}`}
+                        aria-label={`${item.title} 열기`}
+                      >
                         <div
                           className="thumb"
                           data-has-cover={Boolean(item.visual.cover)}
@@ -390,6 +445,7 @@ function App() {
                           </div>
                         </div>
                       </a>
+                      <WorkLinkList className="card-quick-links" links={item.links} />
                     </article>
                   ))}
                 </div>
@@ -462,6 +518,7 @@ function DetailPage({
                     <span key={tag}>{tag}</span>
                   ))}
                 </div>
+                <WorkLinkList className="detail-actions" links={item.links} />
               </div>
             </header>
 
@@ -479,6 +536,29 @@ function DetailPage({
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+function WorkLinkList({ className, links }: { className: string; links?: WorkItem["links"] }) {
+  const visibleLinks = visibleWorkLinks(links);
+
+  if (visibleLinks.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={className} aria-label="관련 링크">
+      {visibleLinks.map((link) => {
+        const Icon = link.icon;
+
+        return (
+          <a key={link.key} href={resolvePublicPath(link.href)} rel="noopener noreferrer" target="_blank">
+            <Icon size={15} aria-hidden="true" />
+            {link.label}
+          </a>
+        );
+      })}
+    </div>
   );
 }
 

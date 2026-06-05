@@ -163,6 +163,8 @@ button {
 }
 
 .work-card {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   border: 1px solid var(--hairline);
   border-radius: 12px;
@@ -181,9 +183,9 @@ button {
   transform: translateY(-3px);
 }
 
-.work-card a {
+.card-main-link {
   display: block;
-  height: 100%;
+  flex: 1 1 auto;
 }
 
 .thumb {
@@ -361,6 +363,43 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+}
+
+.card-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 0 18px 18px;
+}
+
+.card-quick-links a,
+.detail-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px solid var(--hairline);
+  border-radius: 7px;
+  color: var(--charcoal);
+  background: var(--canvas);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.card-quick-links a {
+  padding: 0 9px;
+}
+
+.card-quick-links a:hover,
+.detail-actions a:hover {
+  border-color: var(--hairline-strong);
+  color: var(--name-accent);
+  background: var(--surface-soft);
 }
 
 .state-message {
@@ -549,6 +588,19 @@ button {
   background: var(--canvas);
   font-size: 13px;
   font-weight: 650;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 24px;
+}
+
+.detail-actions a {
+  min-height: 38px;
+  padding: 0 13px;
+  font-size: 14px;
 }
 
 .detail-layout {
