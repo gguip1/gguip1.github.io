@@ -1,27 +1,28 @@
 {
-  "name": "gguip1-github-io",
+  "name": "odd-tools-monorepo",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite --host 127.0.0.1",
-    "inspect:notion": "node scripts/inspect-notion.mjs",
-    "export:notion": "node scripts/export-notion.mjs",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview --host 127.0.0.1"
+  "engines": {
+    "node": ">=22.12"
   },
-  "dependencies": {
-    "lucide-react": "^0.468.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+  "workspaces": [
+    "projects/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:portal": "npm run dev --workspace @odd-tools/portal",
+    "dev:money-world": "npm run dev --workspace @odd-tools/money-world",
+    "build": "node tooling/build-all.mjs",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "verify:contracts": "node tooling/verify-projects.mjs",
+    "verify": "npm run verify:contracts && npm run typecheck && npm run build"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^6.0.5",
     "typescript": "^5.6.3",
-    "vite": "^5.4.11"
+    "vite": "^8.2.0"
   }
 }

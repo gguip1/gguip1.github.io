@@ -1,73 +1,42 @@
-# gguip archive
+# Odd Tools
 
-Personal archive mockup for GitHub Pages.
+잠깐씩 해볼 수 있는 이상하고 유용한 웹 도구를 모으는 정적 웹 프로젝트입니다.
 
-## Development
+이 저장소는 프로젝트 중심 모노레포입니다. 포털과 각 도구는 `projects/` 아래에서 코드, 문서, 에이전트 지침, 하네스를 함께 관리합니다.
+
+## 시작하기
 
 ```bash
 npm install
-npm run export:notion
-npm run dev
+npm run dev:portal
 ```
 
-The first page reads generated content from `public/data/index.json`.
-
-## Notion inspection
-
-Before building the exporter, inspect the actual Notion response shape:
+첫 번째 도구만 실행하려면:
 
 ```bash
-cp .env.example .env
-# Fill NOTION_API_KEY and NOTION_DATA_SOURCE_ID.
-npm run inspect:notion
+npm run dev:money-world
 ```
 
-The script writes ignored files under `output/notion-inspect/`:
-
-- `summary-*.md`: property names, property types, block type counts, media count
-- `inspect-*.json`: sampled page properties and block children
-
-Use this output to decide the final `index.json` fields and the Markdown export rules.
-
-## Notion export preview
-
-Generate `public/data/index.json` from the Notion Archive database:
+## 검증
 
 ```bash
-npm run export:notion
-npm run dev
+npm run verify
 ```
 
-The Archive database must be shared with the Notion integration used by `NOTION_API_KEY`.
+이 명령은 프로젝트 계약, 타입, 개별 빌드, 최종 배포 묶음을 검사합니다.
 
-Recommended Archive properties:
+로컬에 Node.js가 없다면 Docker로 같은 검증을 실행할 수 있습니다.
 
-- `Name` title
-- `Type` select: `project`, `post`, `experiment`, `note`
-- `Status` select: only `public` is exported
-- `Summary` rich text
-- `Tags` multi-select
-- `Cover` files
-- `Date` date: controls the card date and sort order. `날짜`, `Published At`, and `Published` are also accepted. If empty, the exporter falls back to the Notion page creation time.
+```bash
+docker compose run --rm verify
+```
 
-The exporter writes the card index to `public/data/index.json` and reads each public page's blocks into Markdown at `public/data/items/{pageId}.json`.
-Images in page body blocks are mirrored to `public/assets/notion/{pageId}/image-*.ext`.
-Nested block traversal is controlled by `NOTION_EXPORT_BLOCK_DEPTH` and defaults to `4`.
+## 주요 문서
 
-## GitHub Pages deploy
-
-Repository settings:
-
-- Pages source: `GitHub Actions`
-
-Required repository secrets:
-
-- `NOTION_API_KEY`
-- `NOTION_DATA_SOURCE_ID`
-
-Optional repository variables:
-
-- `NOTION_VERSION` defaults to `2026-03-11`
-- `NOTION_EXPORT_BLOCK_DEPTH` defaults to `4`
-
-The workflow runs on `main` pushes, manual dispatch, and daily at `03:00` KST.
+- `ARCHITECTURE.md`: 저장소 구조와 프로젝트 경계
+- `CHANGELOG.md`: 저장소 전체 변경 기록
+- `AGENTS.md`: 모든 AI 에이전트가 따르는 공통 규칙
+- `projects/*/AGENTS.md`: 프로젝트별 작업 규칙
+- `projects/*/CHANGELOG.md`: 프로젝트별 변경 기록
+- `projects/*/SPEC.md`: 프로젝트별 제품 명세
+- `projects/*/harnesses/`: 프로젝트별 검증 하네스

@@ -1,0 +1,8 @@
+{
+  "id": "PROJECT_ID",
+  "title": "PROJECT_TITLE",
+  "type": "tool",
+  "route": "/tools/PROJECT_ID/",
+  "status": "foundation",
+  "harnesses": []
+}

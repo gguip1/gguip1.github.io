@@ -1,0 +1,13 @@
+{
+  "id": "money-world",
+  "title": "그 돈으로",
+  "type": "tool",
+  "route": "/tools/money-world/",
+  "status": "foundation",
+  "privacy": {
+    "server": false,
+    "externalApi": false,
+    "storesUserInput": false
+  },
+  "harnesses": []
+}

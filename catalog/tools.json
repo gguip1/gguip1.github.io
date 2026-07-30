@@ -1,0 +1,10 @@
+[
+  {
+    "id": "money-world",
+    "title": "그 돈으로",
+    "description": "내가 쓴 돈의 이상한 평행세계를 보여드립니다.",
+    "href": "/tools/money-world/",
+    "status": "development",
+    "tags": ["돈", "환산", "랜덤"]
+  }
+]

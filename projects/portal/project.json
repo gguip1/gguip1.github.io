@@ -1,0 +1,8 @@
+{
+  "id": "portal",
+  "title": "Odd Tools Portal",
+  "type": "portal",
+  "route": "/",
+  "status": "foundation",
+  "harnesses": []
+}

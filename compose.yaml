@@ -1,0 +1,13 @@
+services:
+  verify:
+    image: node:22.23.1
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - odd-tools-node-modules:/workspace/node_modules
+      - odd-tools-npm-cache:/root/.npm
+    command: sh -lc "npm ci && npm run verify"
+
+volumes:
+  odd-tools-node-modules:
+  odd-tools-npm-cache:
